@@ -22,7 +22,11 @@ public class Move {
     @ManyToOne(optional = false)
     private User player;
 
-    private int row;
+    private int roww;
 
     private int col;
+    
+    public void ab() {
+    	
+    }
 }

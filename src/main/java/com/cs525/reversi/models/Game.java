@@ -18,7 +18,7 @@ public class Game {
     private int id;
 
     @Type(type = "uuid-char")
-    @Column(unique = true, nullable = false)
+    @Column( nullable = false)
     @NonNull
     private UUID uuid;
 
@@ -44,5 +44,5 @@ public class Game {
     private GameStatus status;
 
     // nullable
-    private Player winner;
+    //private Player winner;
 }

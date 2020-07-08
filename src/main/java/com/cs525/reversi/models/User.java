@@ -17,11 +17,11 @@ public class User {
     private int id;
 
     @Type(type = "uuid-char")
-    @Column(unique = true, nullable = false)
+    @Column( nullable = false)
     @NonNull
     private UUID uuid;
 
-    @Column(unique = true, nullable = false)
+    @Column( nullable = false)
     @NonNull
     private String username;
 }
