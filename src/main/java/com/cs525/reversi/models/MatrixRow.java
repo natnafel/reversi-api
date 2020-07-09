@@ -21,5 +21,5 @@ public class MatrixRow {
     private long id;
 
     @ElementCollection
-    private List<String> cells;
+    private List<CellValue> cells;
 }
