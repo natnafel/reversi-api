@@ -3,17 +3,24 @@ package com.cs525.reversi.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cs525.reversi.config.Mapper;
 import com.cs525.reversi.models.Game;
 import com.cs525.reversi.models.GameStatus;
 import com.cs525.reversi.models.MatrixRow;
+import com.cs525.reversi.models.Move;
 import com.cs525.reversi.models.User;
 import com.cs525.reversi.repositories.GameRepository;
+import com.cs525.reversi.repositories.MoveRepository;
 import com.cs525.reversi.repositories.UserRepository;
 import com.cs525.reversi.req.NewGame;
+import com.cs525.reversi.resp.Dto;
+import com.cs525.reversi.resp.MoveResponse;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -22,6 +29,10 @@ public class GameServiceImpl implements GameService {
 	private GameRepository gameRepo;
 	@Autowired
 	private UserRepository userRepo;
+	@Autowired
+	private MoveRepository moveRepo;
+	@Autowired
+	private Mapper mapper;
 
 	@Override
 	public String createNewGame(NewGame newGameForm) {
@@ -65,6 +76,14 @@ public class GameServiceImpl implements GameService {
 			rows.add(row);
 		}
 		return rows;
+	}
+
+	@Override
+	public List<Dto> getMoves(UUID gameuuid) {
+		Game game = gameRepo.findByUuid(gameuuid);
+		if(game == null) return new ArrayList<>();
+		List<Move> moves = moveRepo.findByGameId(game.getId());
+		return moves.stream().map(mapper::moveModelToResponse).collect(Collectors.toList());
 	}
 
 }
