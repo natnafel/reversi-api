@@ -77,11 +77,12 @@ public class GameServiceImpl implements GameService {
 
 		for(int row = 0; row < rowSize; row++){
 			for (int col = 0; col < colSize; col++){
+				int points = 0;
 				for (CellIterator iterator: iterators){
-					int points = points(iterator, row, col, newCellValue);
-					if (points > 0){
-						result.add(new MovePoint(row, col, points));
-					}
+					points += points(iterator, row, col, newCellValue);
+				}
+				if (points > 0){
+					result.add(new MovePoint(row, col, points));
 				}
 			}
 		}
