@@ -1,7 +1,9 @@
 package com.cs525.reversi.services;
 
-import org.springframework.stereotype.Service;
+import com.cs525.reversi.req.NewGame;
 
-@Service
-public class GameService {
+public interface GameService {
+
+	String createNewGame(NewGame newGameForm);
+
 }
