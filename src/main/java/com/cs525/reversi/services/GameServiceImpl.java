@@ -7,10 +7,7 @@ import java.util.stream.Collectors;
 
 import com.cs525.reversi.models.*;
 import com.cs525.reversi.util.iterators.*;
-import com.cs525.reversi.util.rules.EmptyRule;
-import com.cs525.reversi.util.rules.OpenGameRule;
-import com.cs525.reversi.util.rules.ResultsInPointsRule;
-import com.cs525.reversi.util.rules.Rule;
+import com.cs525.reversi.util.rules.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +23,14 @@ public class GameServiceImpl implements GameService {
 	private final Rule gameRule;
 
 	public GameServiceImpl(GameRepository gameRepo, UserRepository userRepo,
-						   EmptyRule emptyRule, OpenGameRule openGameRule, ResultsInPointsRule resultsInPointsRule) {
+						   EmptyRule emptyRule, OpenGameRule openGameRule, NewValueNotEmptyRule newValueNotEmptyRule,
+						   ResultsInPointsRule resultsInPointsRule) {
 		this.gameRepo = gameRepo;
 		this.userRepo = userRepo;
 		this.gameRule = emptyRule;
 		emptyRule.setNext(openGameRule);
-		openGameRule.setNext(resultsInPointsRule);
+		openGameRule.setNext(newValueNotEmptyRule);
+		newValueNotEmptyRule.setNext(resultsInPointsRule);
 	}
 
 
