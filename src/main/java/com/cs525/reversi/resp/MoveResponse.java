@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MoveResponse implements Dto{
+public class MoveResponse {
 		private int id;
 	    //private User player;
-	    private int roww;
+	    private int row;
 	    private int col;
 }
