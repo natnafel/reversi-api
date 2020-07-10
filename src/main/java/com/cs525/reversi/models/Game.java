@@ -76,5 +76,5 @@ public class Game {
 		 this.changeCellValue(4, 3, CellValue.BLACK);
 	}
 	// nullable
-	// private Player winner;
+	private Player winner;
 }
