@@ -2,6 +2,8 @@ package com.cs525.reversi.util.iterators;
 
 import com.cs525.reversi.models.CellValue;
 import com.cs525.reversi.models.MatrixRow;
+import com.cs525.reversi.req.CellLocation;
+import com.cs525.reversi.util.Pair;
 
 import java.util.List;
 
@@ -13,7 +15,7 @@ public abstract class CellIterator {
         this.rows = rows;
     }
 
-    public abstract CellValue next();
+    public abstract Pair<CellLocation, CellValue> next();
     public abstract boolean hasNext();
 
     public void setPosition(int row, int col) {
@@ -40,4 +42,9 @@ public abstract class CellIterator {
     protected CellValue getCellValue(int row, int col){
         return rows.get(row).getCells().get(col);
     }
+
+    protected CellLocation getCellLocation(int row, int col) {
+        return new CellLocation(row, col);
+    }
+
 }

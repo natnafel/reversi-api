@@ -2,6 +2,8 @@ package com.cs525.reversi.util.iterators;
 
 import com.cs525.reversi.models.CellValue;
 import com.cs525.reversi.models.MatrixRow;
+import com.cs525.reversi.req.CellLocation;
+import com.cs525.reversi.util.Pair;
 
 import java.util.List;
 
@@ -11,8 +13,8 @@ public class SouthIterator extends CellIterator {
     }
 
     @Override
-    public CellValue next() {
-        return getCellValue(++currRow, currCol);
+    public Pair<CellLocation, CellValue> next() {
+        return new Pair<>(getCellLocation(++currRow, currCol), getCellValue(currRow, currCol));
     }
 
     @Override

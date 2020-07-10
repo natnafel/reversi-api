@@ -6,20 +6,23 @@ import java.util.UUID;
 import com.cs525.reversi.models.CellValue;
 import com.cs525.reversi.models.Game;
 import com.cs525.reversi.models.MatrixRow;
-import com.cs525.reversi.models.MovePoint;
 import com.cs525.reversi.req.NewGame;
 import com.cs525.reversi.resp.GameResponse;
 import com.cs525.reversi.resp.MoveResponse;
+import com.cs525.reversi.models.*;
+import com.cs525.reversi.req.CellLocation;
+import com.cs525.reversi.req.NewGame;
+import com.cs525.reversi.resp.NewGameAndMoveResp;
 
 
 public interface GameService {
 
-	String createNewGame(NewGame newGameForm);
 	List<MoveResponse> getMoves(UUID gameuuid);
+	NewGameAndMoveResp createNewGame(NewGame newGameForm);
 
-	List<MovePoint> nextPossibleMoves(List<MatrixRow> rows, CellValue newCellValue);
+	List<MoveScore> nextPossibleMoves(List<MatrixRow> rows, CellValue newCellValue);
 
-	boolean validateMove(Game game, int row, int col, CellValue newCellValue);
 	GameResponse getGame(UUID uuid);
 
+	boolean validateMove(Game game, CellLocation cellLocation, CellValue newCellValue);
 }

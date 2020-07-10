@@ -40,6 +40,7 @@ public class ReversiGameBuilder implements GameBuilder {
 
 	 public ReversiGameBuilder buildBoardGame() {
 		 this.reversiGame.setRows(generateBoard());
+		 this.reversiGame.setDefaultCells();
 		 return this;
 	 }
     
