@@ -35,7 +35,7 @@ public class Game {
 	private int id;
 
 	@Type(type = "uuid-char")
-	@Column(nullable = false)
+	@Column( nullable = false)
 	@NonNull
 	private UUID uuid;
 
@@ -65,6 +65,16 @@ public class Game {
 	@OneToMany(cascade = CascadeType.ALL)
     private List<MatrixRow> rows;	
 
+	public void changeCellValue (Integer cellRow , Integer cellCol , CellValue value) {
+		rows.get(cellRow).getCells().add(cellCol, value);
+	}
+	
+	public void setDefaultCells() {
+		 this.changeCellValue(3, 3, CellValue.WHITE);
+		 this.changeCellValue(4, 4, CellValue.WHITE);
+		 this.changeCellValue(3, 4, CellValue.BLACK);
+		 this.changeCellValue(4, 3, CellValue.BLACK);
+	}
 	// nullable
 	// private Player winner;
 }

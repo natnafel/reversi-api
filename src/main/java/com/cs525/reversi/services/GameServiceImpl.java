@@ -1,19 +1,16 @@
 package com.cs525.reversi.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import com.cs525.reversi.models.*;
-import com.cs525.reversi.util.iterators.*;
-import com.cs525.reversi.util.rules.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.cs525.reversi.repositories.GameRepository;
 import com.cs525.reversi.repositories.UserRepository;
 import com.cs525.reversi.req.NewGame;
+import com.cs525.reversi.util.iterators.*;
+import com.cs525.reversi.util.rules.*;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -101,42 +98,20 @@ public class GameServiceImpl implements GameService {
 		User player1 = userRepo.findByUsername("comp");
 
 		if (player2 == null) {
-			player2 = new User();
-			player2.setUsername(newGameForm.getUserName());
-			player2.setUuid(UUID.randomUUID());
+			player2 = new User(UUID.randomUUID(), newGameForm.getUserName());
 			userRepo.save(player2);
 		}
 
-		Game game = new Game();
-		game.setPlayer1(player1);
-		game.setPlayer2(player2);
-		UUID gameUuid = UUID.randomUUID();
-		game.setUuid(gameUuid);
-		game.setRows(generateBoard());
-		game.setStatus(GameStatus.OPEN);
+		GameBuilder reversiGameBuilder = new ReversiGameBuilder();
+
+		Game game = reversiGameBuilder.buildPlayerOne(player1).buildPlayerTwo(player2).buildGameStatus(GameStatus.OPEN)
+				.buildGameUUID().buildBoardGame().getGame();
+
+		game.setDefaultCells();
+
 		gameRepo.save(game);
-		return gameUuid.toString();
-	}
+		return game.getUuid().toString();
 
-	private List<MatrixRow> generateBoard() {
-		List<MatrixRow> rows = new ArrayList<MatrixRow>();
-
-		for (int i = 1; i <= 8; i++) {
-			MatrixRow row = new MatrixRow();
-			List<String> cells = new ArrayList<String>();
-			for (int j = 1; j <= 8; j++) {
-				if (i == 4 && j == 4 || i == 5 && j == 5)
-					cells.add("WHITE");
-				else if (i == 4 && j == 5 || i == 5 && j == 4)
-					cells.add("BLACK");
-				else
-					cells.add("EMPTY");
-			}
-			// FIXME
-			row.setCells(cells.stream().map(CellValue::valueOf).collect(Collectors.toList()));
-			rows.add(row);
-		}
-		return rows;
 	}
 
 }
