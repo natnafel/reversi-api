@@ -1,18 +1,24 @@
 package com.cs525.reversi.services;
 
+import com.cs525.reversi.exception.UsernameDoesNotExist;
 import com.cs525.reversi.models.*;
 import com.cs525.reversi.repositories.GameRepository;
 import com.cs525.reversi.repositories.UserRepository;
 import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.req.NewGame;
+import com.cs525.reversi.resp.Info;
+import com.cs525.reversi.resp.NewGameAndMoveResp;
+import com.cs525.reversi.resp.ResponseStatus;
 import com.cs525.reversi.util.iterators.*;
 import com.cs525.reversi.util.rules.*;
 import javafx.util.Pair;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -20,6 +26,12 @@ public class GameServiceImpl implements GameService {
 	private final GameRepository gameRepo;
 	private final UserRepository userRepo;
 	private final Rule gameRule;
+
+	@Value("${reversi.default-player.username}")
+	private String defaultPlayerUsername;
+
+	private static final String GAME_CREATED_SUCCESSFULLY_MESSAGE = "Game created successfully";
+	private static final int DEFAULT_START_SCORE = 2;
 
 	public GameServiceImpl(GameRepository gameRepo, UserRepository userRepo,
 						   EmptyRule emptyRule, OpenGameRule openGameRule, NewValueNotEmptyRule newValueNotEmptyRule,
@@ -95,25 +107,27 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
-	public String createNewGame(NewGame newGameForm) {
+	public NewGameAndMoveResp createNewGame(NewGame newGameForm) {
 
-		User player2 = userRepo.findByUsername(newGameForm.getUserName());
-		User player1 = userRepo.findByUsername("comp");
-
-		if (player2 == null) {
-			player2 = new User(UUID.randomUUID(), newGameForm.getUserName());
-			userRepo.save(player2);
-		}
+		User player1 = userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername));
+		User player2 = userRepo.findByUsername(newGameForm.getUserName()).orElseGet(() -> userRepo.save(new User(UUID.randomUUID(), newGameForm.getUserName())));
 
 		GameBuilder reversiGameBuilder = new ReversiGameBuilder();
 
-		Game game = reversiGameBuilder.buildPlayerOne(player1).buildPlayerTwo(player2).buildGameStatus(GameStatus.OPEN)
-				.buildGameUUID().buildBoardGame().getGame();
-
-		game.setDefaultCells();
+		Game game = reversiGameBuilder
+				.buildPlayerOne(player1)
+				.buildPlayerTwo(player2)
+				.buildGameStatus(GameStatus.OPEN)
+				.buildGameUUID()
+				.buildBoardGame()
+				.getGame();
 
 		gameRepo.save(game);
-		return game.getUuid().toString();
+
+		// TODO handle scenario when newGame.firstMove == HOME (API makes move) as a result board, homeTotalScore and awayTotalScore is adjusted
+		return new NewGameAndMoveResp(new Info(ResponseStatus.SUCCESSFUL, GAME_CREATED_SUCCESSFULLY_MESSAGE), game.getUuid(),
+				DEFAULT_START_SCORE, DEFAULT_START_SCORE, null,
+				game.getRows().stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList()));
 
 	}
 
