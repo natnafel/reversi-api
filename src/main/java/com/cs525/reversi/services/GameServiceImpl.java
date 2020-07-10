@@ -11,7 +11,7 @@ import com.cs525.reversi.resp.NewGameAndMoveResp;
 import com.cs525.reversi.resp.ResponseStatus;
 import com.cs525.reversi.util.iterators.*;
 import com.cs525.reversi.util.rules.*;
-import javafx.util.Pair;
+import com.cs525.reversi.util.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

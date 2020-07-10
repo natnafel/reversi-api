@@ -3,7 +3,7 @@ package com.cs525.reversi.util.iterators;
 import com.cs525.reversi.models.CellValue;
 import com.cs525.reversi.models.MatrixRow;
 import com.cs525.reversi.req.CellLocation;
-import javafx.util.Pair;
+import com.cs525.reversi.util.Pair;
 
 import java.util.List;
 
