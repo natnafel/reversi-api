@@ -3,9 +3,11 @@ package com.cs525.reversi.services;
 import com.cs525.reversi.models.*;
 import com.cs525.reversi.repositories.GameRepository;
 import com.cs525.reversi.repositories.UserRepository;
+import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.req.NewGame;
 import com.cs525.reversi.util.iterators.*;
 import com.cs525.reversi.util.rules.*;
+import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,28 +46,28 @@ public class GameServiceImpl implements GameService {
 		return iterators;
 	}
 
-	private int points(CellIterator iterator, int startRow, int startCol, CellValue newCellValue) {
-		int points = 0;
+	private List<CellLocation> flipLocations(CellIterator iterator, CellLocation startCell, CellValue newCellValue) {
+		List<CellLocation> flipLocations = new ArrayList<>();
 		boolean seenCellWithSameValue = false;
 
-		iterator.setPosition(startRow, startCol);
+		iterator.setPosition(startCell.getRow(), startCell.getCol());
 
 		while(iterator.hasNext()){
-			CellValue next = iterator.next();
-			if (next == CellValue.EMPTY) break;
-			if (next == newCellValue) {
+			Pair<CellLocation, CellValue> next = iterator.next();
+			if (next.getValue() == CellValue.EMPTY) break;
+			if (next.getValue() == newCellValue) {
 				seenCellWithSameValue = true;
 				break;
 			}
-			points++;
+			flipLocations.add(next.getKey());
 		}
 
-		return seenCellWithSameValue? points: 0;
+		return seenCellWithSameValue? flipLocations: new ArrayList<>();
 	}
 
 	@Override
-	public List<MovePoint> nextPossibleMoves(List<MatrixRow> rows, CellValue newCellValue) {
-		List<MovePoint> result = new ArrayList<>();
+	public List<MoveScore> nextPossibleMoves(List<MatrixRow> rows, CellValue newCellValue) {
+		List<MoveScore> result = new ArrayList<>();
 
 		List<CellIterator> iterators = cellIterators(rows);
 		int rowSize = rows.size();
@@ -73,12 +75,13 @@ public class GameServiceImpl implements GameService {
 
 		for(int row = 0; row < rowSize; row++){
 			for (int col = 0; col < colSize; col++){
-				int points = 0;
+				List<CellLocation> cellsToFlip = new ArrayList<>();
+				CellLocation newCellLocation = new CellLocation(row, col);
 				for (CellIterator iterator: iterators){
-					points += points(iterator, row, col, newCellValue);
+					cellsToFlip.addAll(flipLocations(iterator, newCellLocation, newCellValue));
 				}
-				if (points > 0){
-					result.add(new MovePoint(row, col, points));
+				if (cellsToFlip.size() > 0){
+					result.add(new MoveScore(newCellLocation, cellsToFlip));
 				}
 			}
 		}
@@ -87,8 +90,8 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
-	public boolean validateMove(Game game, int row, int col, CellValue newCellValue) {
-		return gameRule.isValid(game, row, col, newCellValue);
+	public boolean validateMove(Game game, CellLocation cellLocation, CellValue newCellValue) {
+		return gameRule.isValid(game, cellLocation, newCellValue);
 	}
 
 	@Override
