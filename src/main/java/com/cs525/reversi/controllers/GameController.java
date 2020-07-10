@@ -4,6 +4,7 @@ import com.cs525.reversi.req.NewGame;
 import com.cs525.reversi.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,5 +20,10 @@ public class GameController {
 	@PostMapping("/games")
 	public ResponseEntity<?> createNewGame(@RequestBody NewGame newGameForm) {
 		return ResponseEntity.ok(gameService.createNewGame(newGameForm));
+	}
+	
+	@GetMapping("/algorithms")
+	public ResponseEntity<?> getSupportedAlgorithm() {
+		return ResponseEntity.ok(gameService.getSupportedAlgorithms());
 	}
 }
