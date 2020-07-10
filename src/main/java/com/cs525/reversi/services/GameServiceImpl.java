@@ -27,6 +27,7 @@ import com.cs525.reversi.req.NewGame;
 import com.cs525.reversi.resp.Info;
 import com.cs525.reversi.resp.NewGameAndMoveResp;
 import com.cs525.reversi.resp.ResponseStatus;
+import com.cs525.reversi.util.Pair;
 import com.cs525.reversi.util.iterators.CellIterator;
 import com.cs525.reversi.util.iterators.EastIterator;
 import com.cs525.reversi.util.iterators.NorthEastIterator;
@@ -41,8 +42,6 @@ import com.cs525.reversi.util.rules.NewValueNotEmptyRule;
 import com.cs525.reversi.util.rules.OpenGameRule;
 import com.cs525.reversi.util.rules.ResultsInPointsRule;
 import com.cs525.reversi.util.rules.Rule;
-
-import javafx.util.Pair;
 
 @Service
 public class GameServiceImpl implements GameService {
