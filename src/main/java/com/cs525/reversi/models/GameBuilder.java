@@ -6,11 +6,11 @@ public interface GameBuilder {
 
 	public GameBuilder buildPlayerTwo(User playerTwo);
 
-	public ReversiGameBuilder buildGameStatus(GameStatus gameStatus);
+	public GameBuilder buildGameStatus(GameStatus gameStatus);
 
-	public ReversiGameBuilder buildGameUUID();
+	public GameBuilder buildGameUUID();
 
-	public ReversiGameBuilder buildBoardGame();
+	public GameBuilder buildBoardGame();
 	
 
 	public Game getGame();
