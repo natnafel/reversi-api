@@ -14,4 +14,6 @@ public interface GameService {
 	List<MoveScore> nextPossibleMoves(List<MatrixRow> rows, CellValue newCellValue);
 
 	boolean validateMove(Game game, CellLocation cellLocation, CellValue newCellValue);
+
+    List<Game> getAll();
 }

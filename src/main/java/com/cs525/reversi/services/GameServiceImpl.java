@@ -14,6 +14,8 @@ import com.cs525.reversi.util.rules.*;
 import com.cs525.reversi.util.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +101,11 @@ public class GameServiceImpl implements GameService {
 		}
 
 		return result;
+	}
+
+	@Override
+	public List<Game> getAll() {
+		return gameRepo.findAll();
 	}
 
 	@Override
