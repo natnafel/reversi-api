@@ -30,7 +30,7 @@ public class GameController {
 	
 
 	@PostMapping("/games")
-	public ResponseEntity<?> addCourse(@RequestBody NewGame newGameForm) {
+	public ResponseEntity<?> createNewGame(@RequestBody NewGame newGameForm) {
 
 		String gameUUid = gameService.createNewGame(newGameForm);
 		return ResponseEntity.ok(new NewGameResp(gameUUid));
