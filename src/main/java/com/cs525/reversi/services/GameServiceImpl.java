@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.cs525.reversi.config.Mapper;
 import com.cs525.reversi.exception.UsernameDoesNotExist;
 import com.cs525.reversi.models.AlgorithmType;
 import com.cs525.reversi.models.CellValue;
@@ -17,14 +19,18 @@ import com.cs525.reversi.models.GameBuilder;
 import com.cs525.reversi.models.GameStatus;
 import com.cs525.reversi.models.LookupResp;
 import com.cs525.reversi.models.MatrixRow;
+import com.cs525.reversi.models.Move;
 import com.cs525.reversi.models.MoveScore;
 import com.cs525.reversi.models.ReversiGameBuilder;
 import com.cs525.reversi.models.User;
 import com.cs525.reversi.repositories.GameRepository;
+import com.cs525.reversi.repositories.MoveRepository;
 import com.cs525.reversi.repositories.UserRepository;
 import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.req.NewGame;
+import com.cs525.reversi.resp.GameResponse;
 import com.cs525.reversi.resp.Info;
+import com.cs525.reversi.resp.MoveResponse;
 import com.cs525.reversi.resp.NewGameAndMoveResp;
 import com.cs525.reversi.resp.ResponseStatus;
 import com.cs525.reversi.util.Pair;
@@ -42,19 +48,6 @@ import com.cs525.reversi.util.rules.NewValueNotEmptyRule;
 import com.cs525.reversi.util.rules.OpenGameRule;
 import com.cs525.reversi.util.rules.ResultsInPointsRule;
 import com.cs525.reversi.util.rules.Rule;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import com.cs525.reversi.exception.UsernameDoesNotExist;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import com.cs525.reversi.config.Mapper;
-import com.cs525.reversi.repositories.MoveRepository;
-import com.cs525.reversi.resp.GameResponse;
-import com.cs525.reversi.resp.MoveResponse;
 
 
 @Service

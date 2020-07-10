@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.cs525.reversi.models.CellValue;
 import com.cs525.reversi.models.Game;
+import com.cs525.reversi.models.LookupResp;
 import com.cs525.reversi.models.MatrixRow;
 import com.cs525.reversi.models.MoveScore;
 import com.cs525.reversi.req.CellLocation;

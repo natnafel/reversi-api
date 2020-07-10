@@ -35,6 +35,7 @@ public class GameController {
 	@GetMapping("/algorithms")
 	public ResponseEntity<?> getSupportedAlgorithm() {
 		return ResponseEntity.ok(gameService.getSupportedAlgorithms());
+	}
 	
 	@GetMapping("/games/{uuid}/moves")
 	public ResponseEntity<?> getMoves(@PathVariable UUID uuid){

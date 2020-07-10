@@ -5,7 +5,7 @@ import java.util.List;
 public class RandomAlgorithm implements Algorithm{
 
 	@Override
-	public Move decideMove(List<MoveScore> movePoints, List<MatrixRow> gameBoard) {
+	public MoveScore decideMove(List<MoveScore> movePoints, List<MatrixRow> gameBoard) {
 		// TODO Auto-generated method stub
 		return null;
 	}
