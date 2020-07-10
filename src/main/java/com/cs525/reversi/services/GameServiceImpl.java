@@ -1,24 +1,16 @@
 package com.cs525.reversi.services;
 
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import com.cs525.reversi.models.*;
-import com.cs525.reversi.util.iterators.*;
-import com.cs525.reversi.util.rules.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-
-import com.cs525.reversi.models.Game;
-import com.cs525.reversi.models.GameBuilder;
-import com.cs525.reversi.models.GameStatus;
-import com.cs525.reversi.models.ReversiGameBuilder;
-import com.cs525.reversi.models.User;
-
 import com.cs525.reversi.repositories.GameRepository;
 import com.cs525.reversi.repositories.UserRepository;
 import com.cs525.reversi.req.NewGame;
+import com.cs525.reversi.util.iterators.*;
+import com.cs525.reversi.util.rules.*;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class GameServiceImpl implements GameService {

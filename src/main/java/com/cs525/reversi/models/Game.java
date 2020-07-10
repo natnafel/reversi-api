@@ -65,15 +65,15 @@ public class Game {
 	@OneToMany(cascade = CascadeType.ALL)
     private List<MatrixRow> rows;	
 
-	public void changeCellValue (Integer cellRow , Integer cellCol , String value) {
+	public void changeCellValue (Integer cellRow , Integer cellCol , CellValue value) {
 		rows.get(cellRow).getCells().add(cellCol, value);
 	}
 	
 	public void setDefaultCells() {
-		 this.changeCellValue(3, 3, "w");
-		 this.changeCellValue(4, 4, "w");
-		 this.changeCellValue(3, 4, "b");
-		 this.changeCellValue(4, 3, "b");
+		 this.changeCellValue(3, 3, CellValue.WHITE);
+		 this.changeCellValue(4, 4, CellValue.WHITE);
+		 this.changeCellValue(3, 4, CellValue.BLACK);
+		 this.changeCellValue(4, 3, CellValue.BLACK);
 	}
 	// nullable
 	// private Player winner;
