@@ -10,7 +10,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class MoveResponse {
 		private int id;
-	    //private User player;
+	    private UserResponse player;
 	    private int row;
 	    private int col;
 }

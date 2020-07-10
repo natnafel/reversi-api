@@ -3,10 +3,8 @@ package com.cs525.reversi.resp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import com.cs525.reversi.models.GameStatus;
-import com.cs525.reversi.models.MatrixRow;
-import com.cs525.reversi.models.Player;
-import com.cs525.reversi.models.User;
+
+import com.cs525.reversi.models.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,7 +22,7 @@ public class GameResponse{
 	private Date createdAt;
 	private Date updatedAt;
 	private GameStatus status;
-    private List<MatrixRow> rows;	
+    private List<List<CellValue>> board;
 	private Player winner;
-	private int moveId;
+	private int lastMoveId;
 }

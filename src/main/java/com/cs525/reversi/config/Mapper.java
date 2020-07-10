@@ -1,5 +1,7 @@
 package com.cs525.reversi.config;
 
+import com.cs525.reversi.models.User;
+import com.cs525.reversi.resp.UserResponse;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
@@ -22,6 +24,10 @@ public class Mapper {
 
 	public GameResponse gameModelToResponse(Game game) {
 		return mapper.map(game, GameResponse.class);
+	}
+
+	public UserResponse userToUserResponse(User user) {
+		return mapper.map(user, UserResponse.class);
 	}
 
 }

@@ -140,7 +140,7 @@ public class GameServiceImpl implements GameService {
 		// TODO handle scenario when newGame.firstMove == HOME (API makes move) as a result board, homeTotalScore and awayTotalScore is adjusted
 		return new NewGameAndMoveResp(new Info(ResponseStatus.SUCCESSFUL, GAME_CREATED_SUCCESSFULLY_MESSAGE), game.getUuid(),
 				DEFAULT_START_SCORE, DEFAULT_START_SCORE, null,
-				game.getRows().stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList()));
+				toBoard(game.getRows()));
 
 	}
 
@@ -151,7 +151,7 @@ public class GameServiceImpl implements GameService {
 		List<Move> moves = moveRepo.findByGameId(game.getId());
 		List<MoveResponse> moveResponses = new ArrayList<>();
 		for(Move move : moves) {
-			moveResponses.add(new MoveResponse(move.getId(), move.getRoww(), move.getCol()));
+			moveResponses.add(new MoveResponse(move.getId(), mapper.userToUserResponse(move.getPlayer()), move.getRoww(), move.getCol()));
 		}
 		return moveResponses;
 	}
@@ -162,8 +162,13 @@ public class GameServiceImpl implements GameService {
 		if(game == null) return null;
 		Move move = moveRepo.findTopByOrderByIdDesc();
 		GameResponse gameResponse = mapper.gameModelToResponse(game);
-		if(move != null) gameResponse.setMoveId(move.getId());	
+		gameResponse.setBoard(toBoard(game.getRows()));
+		if(move != null) gameResponse.setLastMoveId(move.getId());
 		return gameResponse;
+	}
+
+	private List<List<CellValue>> toBoard(List<MatrixRow> rows) {
+		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList());
 	}
 
 }
