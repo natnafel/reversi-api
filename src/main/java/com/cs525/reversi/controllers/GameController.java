@@ -1,15 +1,13 @@
 package com.cs525.reversi.controllers;
 
+import com.cs525.reversi.req.NewGame;
+import com.cs525.reversi.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.cs525.reversi.req.NewGame;
-import com.cs525.reversi.resp.NewGameResp;
-import com.cs525.reversi.services.GameService;
 
 @RestController
 @RequestMapping("/api")
