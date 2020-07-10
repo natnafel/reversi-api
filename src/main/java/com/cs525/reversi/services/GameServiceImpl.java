@@ -42,10 +42,29 @@ import com.cs525.reversi.util.rules.NewValueNotEmptyRule;
 import com.cs525.reversi.util.rules.OpenGameRule;
 import com.cs525.reversi.util.rules.ResultsInPointsRule;
 import com.cs525.reversi.util.rules.Rule;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import com.cs525.reversi.exception.UsernameDoesNotExist;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import com.cs525.reversi.config.Mapper;
+import com.cs525.reversi.repositories.MoveRepository;
+import com.cs525.reversi.resp.GameResponse;
+import com.cs525.reversi.resp.MoveResponse;
+
 
 @Service
 public class GameServiceImpl implements GameService {
 
+
+	@Autowired
+	private MoveRepository moveRepo;
+	@Autowired
+	private Mapper mapper;
 	private final GameRepository gameRepo;
 	private final UserRepository userRepo;
 	private final Rule gameRule;
@@ -144,12 +163,40 @@ public class GameServiceImpl implements GameService {
 
 		gameRepo.save(game);
 
-		// TODO handle scenario when newGame.firstMove == HOME (API makes move) as a
-		// result board, homeTotalScore and awayTotalScore is adjusted
-		return new NewGameAndMoveResp(new Info(ResponseStatus.SUCCESSFUL, GAME_CREATED_SUCCESSFULLY_MESSAGE),
-				game.getUuid(), DEFAULT_START_SCORE, DEFAULT_START_SCORE, null, game.getRows().stream()
-						.map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList()));
 
+
+		// TODO handle scenario when newGame.firstMove == HOME (API makes move) as a result board, homeTotalScore and awayTotalScore is adjusted
+		return new NewGameAndMoveResp(new Info(ResponseStatus.SUCCESSFUL, GAME_CREATED_SUCCESSFULLY_MESSAGE), game.getUuid(),
+				DEFAULT_START_SCORE, DEFAULT_START_SCORE, null,
+				toBoard(game.getRows()));
+
+	}
+
+	@Override
+	public List<MoveResponse> getMoves(UUID gameuuid) {
+		Game game = gameRepo.findByUuid(gameuuid);
+		if(game == null) return new ArrayList<>();
+		List<Move> moves = moveRepo.findByGameId(game.getId());
+		List<MoveResponse> moveResponses = new ArrayList<>();
+		for(Move move : moves) {
+			moveResponses.add(new MoveResponse(move.getId(), mapper.userToUserResponse(move.getPlayer()), move.getRoww(), move.getCol()));
+		}
+		return moveResponses;
+	}
+	
+	@Override
+	public GameResponse getGame(UUID uuid) {
+		Game game = gameRepo.findByUuid(uuid);
+		if(game == null) return null;
+		Move move = moveRepo.findTopByOrderByIdDesc();
+		GameResponse gameResponse = mapper.gameModelToResponse(game);
+		gameResponse.setBoard(toBoard(game.getRows()));
+		if(move != null) gameResponse.setLastMoveId(move.getId());
+		return gameResponse;
+	}
+
+	private List<List<CellValue>> toBoard(List<MatrixRow> rows) {
+		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList());
 	}
 
 	@Override
