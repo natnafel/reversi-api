@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MoveRepository extends JpaRepository<Move, Integer> {
 	List<Move> findByGameId(int gameID);
+	Move findTopByOrderByIdDesc();
 }

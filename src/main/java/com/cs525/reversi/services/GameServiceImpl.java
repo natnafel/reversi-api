@@ -5,30 +5,39 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cs525.reversi.config.Mapper;
+import com.cs525.reversi.models.CellValue;
 import com.cs525.reversi.models.Game;
+import com.cs525.reversi.models.GameBuilder;
 import com.cs525.reversi.models.GameStatus;
 import com.cs525.reversi.models.MatrixRow;
 import com.cs525.reversi.models.Move;
+import com.cs525.reversi.models.MovePoint;
+import com.cs525.reversi.models.ReversiGameBuilder;
 import com.cs525.reversi.models.User;
-
 import com.cs525.reversi.repositories.GameRepository;
 import com.cs525.reversi.repositories.MoveRepository;
 import com.cs525.reversi.repositories.UserRepository;
 import com.cs525.reversi.req.NewGame;
-import com.cs525.reversi.resp.Dto;
+import com.cs525.reversi.resp.GameResponse;
 import com.cs525.reversi.resp.MoveResponse;
-import com.cs525.reversi.util.iterators.*;
-import com.cs525.reversi.util.rules.*;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.cs525.reversi.util.iterators.CellIterator;
+import com.cs525.reversi.util.iterators.EastIterator;
+import com.cs525.reversi.util.iterators.NorthEastIterator;
+import com.cs525.reversi.util.iterators.NorthIterator;
+import com.cs525.reversi.util.iterators.NorthWestIterator;
+import com.cs525.reversi.util.iterators.SouthEastIterator;
+import com.cs525.reversi.util.iterators.SouthIterator;
+import com.cs525.reversi.util.iterators.SouthWestIterator;
+import com.cs525.reversi.util.iterators.WestIterator;
+import com.cs525.reversi.util.rules.EmptyRule;
+import com.cs525.reversi.util.rules.NewValueNotEmptyRule;
+import com.cs525.reversi.util.rules.OpenGameRule;
+import com.cs525.reversi.util.rules.ResultsInPointsRule;
+import com.cs525.reversi.util.rules.Rule;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -138,11 +147,25 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
-	public List<Dto> getMoves(UUID gameuuid) {
+	public List<MoveResponse> getMoves(UUID gameuuid) {
 		Game game = gameRepo.findByUuid(gameuuid);
 		if(game == null) return new ArrayList<>();
 		List<Move> moves = moveRepo.findByGameId(game.getId());
-		return moves.stream().map(mapper::moveModelToResponse).collect(Collectors.toList());
+		List<MoveResponse> moveResponses = new ArrayList<>();
+		for(Move move : moves) {
+			moveResponses.add(new MoveResponse(move.getId(), move.getRoww(), move.getCol()));
+		}
+		return moveResponses;
+	}
+	
+	@Override
+	public GameResponse getGame(UUID uuid) {
+		Game game = gameRepo.findByUuid(uuid);
+		if(game == null) return null;
+		Move move = moveRepo.findTopByOrderByIdDesc();
+		GameResponse gameResponse = mapper.gameModelToResponse(game);
+		if(move != null) gameResponse.setMoveId(move.getId());	
+		return gameResponse;
 	}
 
 }
