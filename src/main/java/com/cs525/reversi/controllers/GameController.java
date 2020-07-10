@@ -2,6 +2,7 @@ package com.cs525.reversi.controllers;
 
 import java.util.List;
 import java.util.UUID;
+
 import com.cs525.reversi.req.NewGame;
 import com.cs525.reversi.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cs525.reversi.resp.GameResponse;
 import com.cs525.reversi.resp.MoveResponse;
+
 
 @RestController
 @RequestMapping("/api")
@@ -40,5 +42,6 @@ public class GameController {
 	public ResponseEntity<?> getGame(@PathVariable UUID uuid){
 		GameResponse game = gameService.getGame(uuid);
 		return game == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(game);
+
 	}
 }

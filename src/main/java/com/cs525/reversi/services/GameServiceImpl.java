@@ -1,5 +1,6 @@
 package com.cs525.reversi.services;
 
+import com.cs525.reversi.exception.UsernameDoesNotExist;
 import com.cs525.reversi.models.*;
 import com.cs525.reversi.repositories.GameRepository;
 import com.cs525.reversi.repositories.UserRepository;
@@ -134,6 +135,7 @@ public class GameServiceImpl implements GameService {
 				.getGame();
 
 		gameRepo.save(game);
+
 
 		// TODO handle scenario when newGame.firstMove == HOME (API makes move) as a result board, homeTotalScore and awayTotalScore is adjusted
 		return new NewGameAndMoveResp(new Info(ResponseStatus.SUCCESSFUL, GAME_CREATED_SUCCESSFULLY_MESSAGE), game.getUuid(),
