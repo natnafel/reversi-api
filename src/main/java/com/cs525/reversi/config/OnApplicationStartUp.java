@@ -6,6 +6,7 @@ import org.hibernate.id.UUIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,9 @@ import com.cs525.reversi.repositories.UserRepository;
 public class OnApplicationStartUp {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	@Value("${reversi.default-player.username}")
+	private String defaultPlayerUsername;
 
 	@Autowired
 	private UserRepository userRepo;
@@ -31,12 +35,12 @@ public class OnApplicationStartUp {
 	}
 
 	private void createDefaultUser() {
-         
-		User user = new User();
-		user.setUsername("comp");
-		user.setUuid(UUID.randomUUID());
-		userRepo.save(user);
-		
+		if(!userRepo.findByUsername(defaultPlayerUsername).isPresent()){
+			User user = new User();
+			user.setUsername(defaultPlayerUsername);
+			user.setUuid(UUID.randomUUID());
+			userRepo.save(user);
+		}
 	}
 
 }
