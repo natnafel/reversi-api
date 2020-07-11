@@ -145,7 +145,7 @@ public class GameModeratorImpl implements GameModerator {
         return rows.get(row).getCells().get(col);
     }
 
-    private boolean isBoardFull(List<MatrixRow> rows) {
+    public boolean isBoardFull(List<MatrixRow> rows) {
         int rowSize = rows.size();
         int colSize = rows.get(0).getCells().size();
         for(int row = 0; row < rowSize; row++) {

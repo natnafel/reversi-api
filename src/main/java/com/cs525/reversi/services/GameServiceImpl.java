@@ -170,7 +170,7 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
-	public NewGameAndMoveResp makeMoveForOpponent(Game game, CellLocation newMoveLocation) {
+	public void makeMoveOnlyForOpponent(Game game, CellLocation newMoveLocation){
 		// player 2 is client
 		if (!gameModerator.validateMove(game, newMoveLocation, game.getPlayer2())) {
 			throw new IllegalMoveException(newMoveLocation);
@@ -185,6 +185,12 @@ public class GameServiceImpl implements GameService {
 		gameRepo.saveAndFlush(game);
 		cellLocationRepo.flush();
 		moveRepo.flush();
+	}
+
+	@Override
+	public NewGameAndMoveResp makeMoveForOpponent(Game game, CellLocation newMoveLocation) {
+
+		makeMoveOnlyForOpponent(game, newMoveLocation);
 
 		String infoMessage = LAST_MOVE_SUCCESSFUL_GAME_OVER;
 		ResponseStatus status = ResponseStatus.GAME_OVER;
@@ -236,7 +242,8 @@ public class GameServiceImpl implements GameService {
 		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList());
 	}
 
-	private MoveScore makeMoveForServer(Game game){
+	@Override
+	public MoveScore makeMoveForServer(Game game){
 		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
 				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), getDefaultAlgorithm());
 

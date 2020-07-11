@@ -29,6 +29,10 @@ public interface GameService {
 
 	NewGameAndMoveResp makeMoveForOpponent(Game game, CellLocation newMoveLocation);
 
+	void makeMoveOnlyForOpponent(Game game, CellLocation newMoveLocation);
+
+	MoveScore makeMoveForServer(Game game);
+
 	User getDefaultPlayer();
 
     List<LookupResp> getSupportedProtocols();
