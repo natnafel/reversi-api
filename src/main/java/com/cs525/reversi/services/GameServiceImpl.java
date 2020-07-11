@@ -158,7 +158,7 @@ public class GameServiceImpl implements GameService {
 
 		gameRepo.save(game);
 
-		playAwayGame(game, awayGameRequest);
+		new Thread(() -> playAwayGame(game, awayGameRequest)).start();
 
 		return new AwayGameResponse(game.getUuid());
 	}
@@ -217,7 +217,6 @@ public class GameServiceImpl implements GameService {
 				.collect(Collectors.toList());
 	}
 
-	@Async
 	void playAwayGame(Game game, AwayGameRequest awayGameRequest){
 		awayGameFactory.getAwayGame(
 				Arrays.stream(Protocol.values())
