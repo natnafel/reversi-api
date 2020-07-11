@@ -29,5 +29,7 @@ public interface GameService {
 
     AwayGameResponse startAwayGame(AwayGameRequest awayGameRequest);
 
-	NewGameAndMoveResp makeMoveForClient(UUID gameUUID, CellLocation newMoveLocation);
+	NewGameAndMoveResp makeMoveForOpponent(UUID gameUUID, CellLocation newMoveLocation);
+
+	NewGameAndMoveResp makeMoveForOpponent(Game game, CellLocation newMoveLocation);
 }

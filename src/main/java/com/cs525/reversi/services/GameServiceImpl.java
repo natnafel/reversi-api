@@ -72,7 +72,7 @@ public class GameServiceImpl implements GameService {
 		int awayScore = DEFAULT_START_SCORE;
 
 		if (newGameForm.getFirstMove() == GameSideDesicion.HOME) {
-			serverMoveCellLocation = makeAMoveForServer(game).getCellLocation();
+			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
 			homeScore = gameModerator.playerScore(game, game.getPlayer1());
 			awayScore = gameModerator.playerScore(game, game.getPlayer2());
 		}
@@ -144,8 +144,13 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
-	public NewGameAndMoveResp makeMoveForClient(UUID gameUUID, CellLocation newMoveLocation) {
-		Game game = gameRepo.findByUuid(gameUUID);
+	public NewGameAndMoveResp makeMoveForOpponent(UUID gameUUID, CellLocation newMoveLocation) {
+		return makeMoveForOpponent(gameRepo.findByUuid(gameUUID), newMoveLocation);
+
+	}
+
+	@Override
+	public NewGameAndMoveResp makeMoveForOpponent(Game game, CellLocation newMoveLocation) {
 		// player 2 is client
 		if (!gameModerator.validateMove(game, newMoveLocation, game.getPlayer2())) {
 			throw new IllegalMoveException(newMoveLocation);
@@ -154,22 +159,23 @@ public class GameServiceImpl implements GameService {
 		gameModerator.applyMove(game, gameModerator.moveScoreForNewPiece(game, newMoveLocation, game.getPlayer2()));
 
 		String infoMessage = LAST_MOVE_SUCCESSFUL_GAME_OVER;
-
+		ResponseStatus status = ResponseStatus.GAME_OVER;
 		CellLocation serverMoveCellLocation = null;
 
 		if (game.getStatus() != GameStatus.CLOSED){
 			infoMessage = MOVE_MADE_SUCCESSFULLY_MESSAGE;
-			serverMoveCellLocation = makeAMoveForServer(game).getCellLocation();
+			status = ResponseStatus.SUCCESSFUL;
+			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
 		}
 
 		gameRepo.save(game);
 
-		return new NewGameAndMoveResp(new Info(ResponseStatus.SUCCESSFUL, infoMessage), game.getUuid(),
+		return new NewGameAndMoveResp(new Info(status, infoMessage), game.getUuid(),
 				gameModerator.playerScore(game, game.getPlayer1()), gameModerator.playerScore(game, game.getPlayer2()),
 				serverMoveCellLocation, toBoard(game.getRows()));
 	}
 
-	private MoveScore makeAMoveForServer(Game game){
+	private MoveScore makeMoveForServer(Game game){
 		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
 				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)),
 				algorithmFactory.getAlgorithm(DEFAULT_SERVER_ALGORITHM));

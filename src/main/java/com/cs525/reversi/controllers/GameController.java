@@ -43,7 +43,7 @@ public class GameController {
 
 	@PostMapping("/games/{gameUUID}/move")
 	public NewGameAndMoveResp makeMove(@PathVariable UUID gameUUID, @RequestBody CellLocation newMoveLocation) {
-		return gameService.makeMoveForClient(gameUUID, newMoveLocation);
+		return gameService.makeMoveForOpponent(gameUUID, newMoveLocation);
 	}
 	
 	@GetMapping("/algorithms")
