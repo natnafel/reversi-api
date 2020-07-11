@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class AlgorithmCodeDoesntExistException extends ReversiException {
     public AlgorithmCodeDoesntExistException(String algorithmCode) {
-        super("Algorithm code %s does not exist");
+        super(String.format("Algorithm code %s does not exist", algorithmCode));
     }
 }
