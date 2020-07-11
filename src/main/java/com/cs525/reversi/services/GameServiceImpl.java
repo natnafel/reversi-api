@@ -77,13 +77,13 @@ public class GameServiceImpl implements GameService {
 		int homeScore = DEFAULT_START_SCORE;
 		int awayScore = DEFAULT_START_SCORE;
 
+		gameRepo.saveAndFlush(game);
+
 		if (newGameForm.getFirstMove() == GameSideDesicion.HOME) {
 			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
 			homeScore = gameModerator.playerScore(game, game.getPlayer1());
 			awayScore = gameModerator.playerScore(game, game.getPlayer2());
 		}
-
-		gameRepo.save(game);
 
 		return new NewGameAndMoveResp(new Info(ResponseStatus.SUCCESSFUL, GAME_CREATED_SUCCESSFULLY_MESSAGE), game.getUuid(),
 				homeScore, awayScore, serverMoveCellLocation,
@@ -182,6 +182,10 @@ public class GameServiceImpl implements GameService {
 		moveRepo.save(new Move(game, game.getPlayer2(), moveScoreOpponent.getCellLocation().getRow(),
 				moveScoreOpponent.getCellLocation().getCol(), moveScoreOpponent.getCellsToFlip()));
 
+		gameRepo.saveAndFlush(game);
+		cellLocationRepo.flush();
+		moveRepo.flush();
+
 		String infoMessage = LAST_MOVE_SUCCESSFUL_GAME_OVER;
 		ResponseStatus status = ResponseStatus.GAME_OVER;
 		CellLocation serverMoveCellLocation = null;
@@ -189,14 +193,8 @@ public class GameServiceImpl implements GameService {
 		if (game.getStatus() != GameStatus.CLOSED){
 			infoMessage = MOVE_MADE_SUCCESSFULLY_MESSAGE;
 			status = ResponseStatus.SUCCESSFUL;
-			MoveScore moveScoreServer = makeMoveForServer(game);
-			serverMoveCellLocation = moveScoreServer.getCellLocation();
-			cellLocationRepo.saveAll(moveScoreServer.getCellsToFlip());
-			moveRepo.save(new Move(game, game.getPlayer1(), moveScoreServer.getCellLocation().getRow(),
-					moveScoreServer.getCellLocation().getCol(), moveScoreServer.getCellsToFlip()));
+			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
 		}
-
-		gameRepo.save(game);
 
 		return new NewGameAndMoveResp(new Info(status, infoMessage), game.getUuid(),
 				gameModerator.playerScore(game, game.getPlayer1()), gameModerator.playerScore(game, game.getPlayer2()),
@@ -244,6 +242,14 @@ public class GameServiceImpl implements GameService {
 				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), getDefaultAlgorithm());
 
 		gameModerator.applyMove(game, serverMove);
+
+		gameRepo.save(game);
+		cellLocationRepo.saveAll(serverMove.getCellsToFlip());
+		moveRepo.save(new Move(game, game.getPlayer1(), serverMove.getCellLocation().getRow(), serverMove.getCellLocation().getCol(), serverMove.getCellsToFlip()));
+
+		cellLocationRepo.flush();
+		moveRepo.flush();
+		gameRepo.flush();
 
 		return serverMove;
 	}
