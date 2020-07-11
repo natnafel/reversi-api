@@ -2,12 +2,11 @@ package com.cs525.reversi.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public class Info {
-    private ResponseStatus status;
-    private String message;
-
+@NoArgsConstructor
+public class UserResponse {
+    private String Username;
 }
