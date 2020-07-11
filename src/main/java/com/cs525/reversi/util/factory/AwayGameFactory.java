@@ -10,9 +10,9 @@ import java.util.List;
 
 @Component
 public class AwayGameFactory {
-    private final List<AwayGame<?>> awayGames;
+    private final List<AwayGame> awayGames;
     @Lazy
-    public AwayGameFactory(List<AwayGame<?>> awayGames) {
+    public AwayGameFactory(List<AwayGame> awayGames) {
         this.awayGames = awayGames;
     }
 

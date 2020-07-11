@@ -27,8 +27,8 @@ public class G3RestAwayGame extends AwayGame<UUID> {
     @Value("${reversi.default-player.username}")
     private String defaultUsername;
 
-    public G3RestAwayGame(GameService gameService, GameModerator gameModerator, RestTemplate restTemplate) {
-        super(gameService, gameModerator);
+    public G3RestAwayGame(GameService gameService, RestTemplate restTemplate) {
+        super(gameService);
         this.restTemplate = restTemplate;
     }
 
