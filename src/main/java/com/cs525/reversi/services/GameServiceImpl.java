@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.cs525.reversi.exception.AlgorithmCodeDoesntExistException;
 import com.cs525.reversi.exception.IllegalMoveException;
+import com.cs525.reversi.exception.ProtocolCodeDoesntExistException;
 import com.cs525.reversi.models.*;
 import com.cs525.reversi.req.AwayGameRequest;
 import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.req.GameSideDesicion;
 import com.cs525.reversi.resp.*;
+import com.cs525.reversi.util.factory.AwayGameFactory;
 import com.cs525.reversi.util.moderator.GameModerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -33,6 +36,7 @@ public class GameServiceImpl implements GameService {
 	private final UserRepository userRepo;
 	private final GameModerator gameModerator;
 	private final AlgorithmFactory algorithmFactory;
+	private final AwayGameFactory awayGameFactory;
 
 	@Value("${reversi.default-player.username}")
 	private String defaultPlayerUsername;
@@ -43,7 +47,7 @@ public class GameServiceImpl implements GameService {
 	private static final int DEFAULT_START_SCORE = 2;
 	private static final AlgorithmType DEFAULT_SERVER_ALGORITHM = AlgorithmType.MinMax;
 
-	public GameServiceImpl(GameRepository gameRepo, UserRepository userRepo, MoveRepository moveRepo,
+	public GameServiceImpl(GameRepository gameRepo, UserRepository userRepo, MoveRepository moveRepo, AwayGameFactory awayGameFactory,
 						   Mapper mapper, GameModerator gameModerator, AlgorithmFactory algorithmFactory) {
 		this.gameRepo = gameRepo;
 		this.userRepo = userRepo;
@@ -51,13 +55,13 @@ public class GameServiceImpl implements GameService {
 		this.moveRepo = moveRepo;
 		this.mapper = mapper;
 		this.algorithmFactory = algorithmFactory;
+		this.awayGameFactory = awayGameFactory;
 	}
 
 	@Override
 	public NewGameAndMoveResp createNewGame(NewGame newGameForm) {
 
-		User player1 = userRepo.findByUsername(defaultPlayerUsername)
-				.orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername));
+		User player1 = getDefaultPlayer();
 		User player2 = userRepo.findByUsername(newGameForm.getUserName())
 				.orElseGet(() -> userRepo.save(new User(UUID.randomUUID(), newGameForm.getUserName())));
 
@@ -125,8 +129,7 @@ public class GameServiceImpl implements GameService {
 	public AwayGameResponse startAwayGame(AwayGameRequest awayGameRequest) {
 		String player2Username = String.format("%s:%s", awayGameRequest.getAddress(), awayGameRequest.getPort());
 
-		User player1 = userRepo.findByUsername(defaultPlayerUsername)
-				.orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername));
+		User player1 = getDefaultPlayer();
 		User player2 = userRepo.findByUsername(player2Username)
 				.orElseGet(() -> userRepo.save(new User(UUID.randomUUID(), player2Username)));
 
@@ -177,10 +180,25 @@ public class GameServiceImpl implements GameService {
 				serverMoveCellLocation, toBoard(game.getRows()));
 	}
 
+	@Override
+	public User getDefaultPlayer() {
+		return userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername));
+	}
+
+	private Algorithm getDefaultAlgorithm(){
+		return algorithmFactory.getAlgorithm(DEFAULT_SERVER_ALGORITHM);
+	}
+
+	@Override
+	public List<LookupResp> getSupportedProtocols() {
+		return Arrays.stream(Protocol.values())
+				.map(protocol -> new LookupResp(protocol.getName(), protocol.getCode()))
+				.collect(Collectors.toList());
+	}
+
 	private MoveScore makeMoveForServer(Game game){
 		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
-				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)),
-				algorithmFactory.getAlgorithm(DEFAULT_SERVER_ALGORITHM));
+				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), getDefaultAlgorithm());
 
 		gameModerator.applyMove(game, serverMove);
 
@@ -189,7 +207,18 @@ public class GameServiceImpl implements GameService {
 
 	@Async
 	void playAwayGame(Game game, AwayGameRequest awayGameRequest){
-
+		awayGameFactory.getAwayGame(
+				Arrays.stream(Protocol.values())
+						.filter(protocol -> protocol.getCode().equals(awayGameRequest.getProtocol()))
+						.findAny()
+						.orElseThrow(() -> new ProtocolCodeDoesntExistException(awayGameRequest.getProtocol())))
+				.play(game, awayGameRequest.getAddress(), awayGameRequest.getPort(),
+						algorithmFactory.getAlgorithm(
+								Arrays.stream(AlgorithmType.values())
+								.filter(algorithmType -> algorithmType.getCode().equals(awayGameRequest.getAlgorithm()))
+								.findAny()
+								.orElseThrow(() -> new AlgorithmCodeDoesntExistException(awayGameRequest.getAlgorithm()))),
+						awayGameRequest.isMakeFirstMove());
 	}
 
 }

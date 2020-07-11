@@ -3,6 +3,7 @@ package com.cs525.reversi.controllers;
 import java.util.List;
 import java.util.UUID;
 
+import com.cs525.reversi.models.LookupResp;
 import com.cs525.reversi.req.AwayGameRequest;
 import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.req.NewGame;
@@ -47,8 +48,13 @@ public class GameController {
 	}
 	
 	@GetMapping("/algorithms")
-	public ResponseEntity<?> getSupportedAlgorithm() {
-		return ResponseEntity.ok(gameService.getSupportedAlgorithms());
+	public List<LookupResp> getSupportedAlgorithm() {
+		return gameService.getSupportedAlgorithms();
+	}
+
+	@GetMapping("/protocols")
+	public List<LookupResp> getSupportedProtocols() {
+		return gameService.getSupportedProtocols();
 	}
 	
 	@GetMapping("/games/{uuid}/moves")

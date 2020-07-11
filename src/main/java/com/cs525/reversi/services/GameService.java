@@ -3,11 +3,7 @@ package com.cs525.reversi.services;
 import java.util.List;
 import java.util.UUID;
 
-import com.cs525.reversi.models.CellValue;
-import com.cs525.reversi.models.Game;
-import com.cs525.reversi.models.LookupResp;
-import com.cs525.reversi.models.MatrixRow;
-import com.cs525.reversi.models.MoveScore;
+import com.cs525.reversi.models.*;
 import com.cs525.reversi.req.AwayGameRequest;
 import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.req.NewGame;
@@ -32,4 +28,8 @@ public interface GameService {
 	NewGameAndMoveResp makeMoveForOpponent(UUID gameUUID, CellLocation newMoveLocation);
 
 	NewGameAndMoveResp makeMoveForOpponent(Game game, CellLocation newMoveLocation);
+
+	User getDefaultPlayer();
+
+    List<LookupResp> getSupportedProtocols();
 }
