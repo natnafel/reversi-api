@@ -28,4 +28,6 @@ public interface GameService {
 	boolean validateMove(Game game, CellLocation cellLocation, CellValue newCellValue);
 
 	List<LookupResp> getSupportedAlgorithms();
+
+	List<GameResponse> getAllGames();
 }

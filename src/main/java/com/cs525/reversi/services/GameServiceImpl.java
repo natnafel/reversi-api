@@ -135,6 +135,22 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
+	public List<GameResponse> getAllGames() {
+
+		List<GameResponse> gameResponses = new ArrayList<>();
+		List<Game> games = gameRepo.findAll();
+
+		for (Game game : games) {
+			GameResponse gameResponse = mapper.gameModelToResponse(game);
+			gameResponse.setBoard(toBoard(game.getRows()));
+			gameResponse.setLastMoveId(-1); // too expensive to compute for each game
+			gameResponses.add(gameResponse);
+		}
+
+		return gameResponses;
+	}
+
+	@Override
 	public boolean validateMove(Game game, CellLocation cellLocation, CellValue newCellValue) {
 		return gameRule.isValid(game, cellLocation, newCellValue);
 	}

@@ -76,5 +76,6 @@ public class Game {
 		 this.changeCellValue(4, 3, CellValue.BLACK);
 	}
 	// nullable
+	@Enumerated(EnumType.STRING)
 	private Player winner;
 }

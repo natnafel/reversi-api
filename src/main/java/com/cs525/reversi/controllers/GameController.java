@@ -18,35 +18,40 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cs525.reversi.resp.GameResponse;
 import com.cs525.reversi.resp.MoveResponse;
 
-
 @RestController
 @RequestMapping("/api")
 public class GameController {
 
 	@Autowired
 	private GameService gameService;
-	
+
 
 	@PostMapping("/games")
 	public ResponseEntity<?> createNewGame(@RequestBody NewGame newGameForm) {
 		return ResponseEntity.ok(gameService.createNewGame(newGameForm));
 	}
-	
+
 	@GetMapping("/algorithms")
 	public ResponseEntity<?> getSupportedAlgorithm() {
 		return ResponseEntity.ok(gameService.getSupportedAlgorithms());
 	}
-	
+
 	@GetMapping("/games/{uuid}/moves")
 	public ResponseEntity<?> getMoves(@PathVariable UUID uuid){
 		List<MoveResponse> moves = gameService.getMoves(uuid);
 		return moves.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(moves);
 	}
-	
+
 	@GetMapping("/games/{uuid}")
 	public ResponseEntity<?> getGame(@PathVariable UUID uuid){
 		GameResponse game = gameService.getGame(uuid);
 		return game == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(game);
 
 	}
+
+	@GetMapping("/games")
+	public List<GameResponse> getListOfGames(){
+		return gameService.getAllGames();
+	}
+
 }
