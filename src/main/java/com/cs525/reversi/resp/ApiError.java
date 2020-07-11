@@ -1,4 +1,4 @@
-package com.cs525.reversi.req;
+package com.cs525.reversi.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewGame {
-
-	 private String userName;
-	 private GameSideDesicion firstMove;
-	 
+public class ApiError {
+    private String message;
 }

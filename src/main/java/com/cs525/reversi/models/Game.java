@@ -66,14 +66,14 @@ public class Game {
     private List<MatrixRow> rows;	
 
 	public void changeCellValue (Integer cellRow , Integer cellCol , CellValue value) {
-		rows.get(cellRow).getCells().add(cellCol, value);
+		rows.get(cellRow).getCells().set(cellCol, value);
 	}
 	
 	public void setDefaultCells() {
-		 this.changeCellValue(3, 3, CellValue.WHITE);
-		 this.changeCellValue(4, 4, CellValue.WHITE);
-		 this.changeCellValue(3, 4, CellValue.BLACK);
-		 this.changeCellValue(4, 3, CellValue.BLACK);
+		 this.changeCellValue(3, 3, CellValue.BLACK);
+		 this.changeCellValue(4, 4, CellValue.BLACK);
+		 this.changeCellValue(3, 4, CellValue.WHITE);
+		 this.changeCellValue(4, 3, CellValue.WHITE);
 	}
 	// nullable
 	@Enumerated(EnumType.STRING)

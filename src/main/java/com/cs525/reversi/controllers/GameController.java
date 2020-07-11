@@ -3,7 +3,12 @@ package com.cs525.reversi.controllers;
 import java.util.List;
 import java.util.UUID;
 
+import com.cs525.reversi.models.LookupResp;
+import com.cs525.reversi.req.AwayGameRequest;
+import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.req.NewGame;
+import com.cs525.reversi.resp.AwayGameResponse;
+import com.cs525.reversi.resp.NewGameAndMoveResp;
 import com.cs525.reversi.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +32,28 @@ public class GameController {
 
 
 	@PostMapping("/games")
-	public ResponseEntity<?> createNewGame(@RequestBody NewGame newGameForm) {
-		return ResponseEntity.ok(gameService.createNewGame(newGameForm));
+	public NewGameAndMoveResp createNewGame(@RequestBody NewGame newGameForm) {
+		return gameService.createNewGame(newGameForm);
+	}
+
+	@PostMapping(value = "/games/away")
+	public AwayGameResponse startAwayGame(@RequestBody AwayGameRequest awayGameRequest) {
+		return gameService.startAwayGame(awayGameRequest);
+	}
+
+	@PostMapping("/games/{gameUUID}/moves")
+	public NewGameAndMoveResp makeMove(@PathVariable UUID gameUUID, @RequestBody CellLocation newMoveLocation) {
+		return gameService.makeMoveForOpponent(gameUUID, newMoveLocation);
 	}
 
 	@GetMapping("/algorithms")
-	public ResponseEntity<?> getSupportedAlgorithm() {
-		return ResponseEntity.ok(gameService.getSupportedAlgorithms());
+	public List<LookupResp> getSupportedAlgorithm() {
+		return gameService.getSupportedAlgorithms();
+	}
+
+	@GetMapping("/protocols")
+	public List<LookupResp> getSupportedProtocols() {
+		return gameService.getSupportedProtocols();
 	}
 
 	@GetMapping("/games/{uuid}/moves")

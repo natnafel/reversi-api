@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  reversi_api_inst_1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db_inst_1
+    environment:
+      DEFAULT_PLAYER_USERNAME: G5_Inst_1
+      JDBC_URL: jdbc:mysql://db_inst_1:3306/reversi?serverTimezone=UTC
+      JDBC_USER: root
+      JDBC_PASSWORD: root
+    ports:
+      - '8070:8080'
+
+  reversi_instance_2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+        - db_inst_2
+    environment:
+      DEFAULT_PLAYER_USERNAME: G5_Inst_2
+      JDBC_URL: jdbc:mysql://db_inst_2:3306/reversi?serverTimezone=UTC
+      JDBC_USER: root
+      JDBC_PASSWORD: root
+    ports:
+      - '8090:8080'
+
+  db_inst_1:
+    image: mysql:5.7
+    volumes:
+      - rv_db_1:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: reversi
+
+  db_inst_2:
+    image: mysql:5.7
+    volumes:
+      - rv_db_2:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: reversi
+
+volumes:
+  rv_db_1:
+  rv_db_2:
