@@ -24,7 +24,6 @@ import com.cs525.reversi.repositories.MoveRepository;
 import com.cs525.reversi.repositories.UserRepository;
 import com.cs525.reversi.req.NewGame;
 
-
 @Service
 public class GameServiceImpl implements GameService {
 
@@ -88,23 +87,27 @@ public class GameServiceImpl implements GameService {
 	@Override
 	public List<MoveResponse> getMoves(UUID gameuuid) {
 		Game game = gameRepo.findByUuid(gameuuid);
-		if(game == null) return new ArrayList<>();
+		if (game == null)
+			return new ArrayList<>();
 		List<Move> moves = moveRepo.findByGameId(game.getId());
 		List<MoveResponse> moveResponses = new ArrayList<>();
-		for(Move move : moves) {
-			moveResponses.add(new MoveResponse(move.getId(), mapper.userToUserResponse(move.getPlayer()), move.getRoww(), move.getCol()));
+		for (Move move : moves) {
+			moveResponses.add(new MoveResponse(move.getId(), mapper.userToUserResponse(move.getPlayer()),
+					move.getRoww(), move.getCol(), move.getCellsToFlip()));
 		}
 		return moveResponses;
 	}
-	
+
 	@Override
 	public GameResponse getGame(UUID uuid) {
 		Game game = gameRepo.findByUuid(uuid);
-		if(game == null) return null;
+		if (game == null)
+			return null;
 		Move move = moveRepo.findTopByOrderByIdDesc();
 		GameResponse gameResponse = mapper.gameModelToResponse(game);
 		gameResponse.setBoard(toBoard(game.getRows()));
-		if(move != null) gameResponse.setLastMoveId(move.getId());
+		if (move != null)
+			gameResponse.setLastMoveId(move.getId());
 		return gameResponse;
 	}
 
@@ -114,7 +117,6 @@ public class GameServiceImpl implements GameService {
 
 	@Override
 	public List<LookupResp> getSupportedAlgorithms() {
-		// TODO Auto-generated method stub
 		return Arrays.stream(AlgorithmType.values()).map(e -> new LookupResp(e.getName(), e.getCode()))
 				.collect(Collectors.toList());
 	}
