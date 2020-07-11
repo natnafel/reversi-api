@@ -10,6 +10,7 @@ import com.cs525.reversi.exception.IllegalMoveException;
 import com.cs525.reversi.models.*;
 import com.cs525.reversi.req.AwayGameRequest;
 import com.cs525.reversi.req.CellLocation;
+import com.cs525.reversi.req.GameSideDesicion;
 import com.cs525.reversi.resp.*;
 import com.cs525.reversi.util.moderator.GameModerator;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,8 +38,8 @@ public class GameServiceImpl implements GameService {
 	@Value("${reversi.default-player.username}")
 	private String defaultPlayerUsername;
 
-	private static final String GAME_CREATED_SUCCESSFULLY_MESSAGE = "Game created successfully";
-	private static final String MOVE_MADE_SUCCESSFULLY_MESSAGE = "Move made successfully";
+	private static final String GAME_CREATED_SUCCESSFULLY_MESSAGE = "Game created successfully. Waiting for your next move.";
+	private static final String MOVE_MADE_SUCCESSFULLY_MESSAGE = "Move made successfully. Waiting for your next move";
 	private static final String LAST_MOVE_SUCCESSFUL_GAME_OVER = "Game over. Last move was made successfully.";
 	private static final int DEFAULT_START_SCORE = 2;
 	private static final AlgorithmType DEFAULT_SERVER_ALGORITHM = AlgorithmType.MinMax;
@@ -66,13 +67,20 @@ public class GameServiceImpl implements GameService {
 		Game game = reversiGameBuilder.buildPlayerOne(player1).buildPlayerTwo(player2).buildGameStatus(GameStatus.OPEN)
 				.buildGameUUID().buildBoardGame().getGame();
 
+		CellLocation serverMoveCellLocation = null;
+		int homeScore = DEFAULT_START_SCORE;
+		int awayScore = DEFAULT_START_SCORE;
+
+		if (newGameForm.getFirstMove() == GameSideDesicion.HOME) {
+			serverMoveCellLocation = makeAMoveForServer(game).getCellLocation();
+			homeScore = gameModerator.playerScore(game, game.getPlayer1());
+			awayScore = gameModerator.playerScore(game, game.getPlayer2());
+		}
+
 		gameRepo.save(game);
 
-
-
-		// TODO handle scenario when newGame.firstMove == HOME (API makes move) as a result board, homeTotalScore and awayTotalScore is adjusted
 		return new NewGameAndMoveResp(new Info(ResponseStatus.SUCCESSFUL, GAME_CREATED_SUCCESSFULLY_MESSAGE), game.getUuid(),
-				DEFAULT_START_SCORE, DEFAULT_START_SCORE, null,
+				homeScore, awayScore, serverMoveCellLocation,
 				toBoard(game.getRows()));
 
 	}

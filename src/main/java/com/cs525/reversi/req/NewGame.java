@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 public class NewGame {
 
 	 private String userName;
-	 private GameSideDesicion gameSideDesicion;
+	 private GameSideDesicion firstMove;
 	 
 }
