@@ -18,6 +18,6 @@ public class ResultsInPointsRule extends Rule {
     public boolean applyRule(Game game, CellLocation cellLocation, CellValue newCellValue) {
         return gameModerator.nextPossibleMoves(game.getRows(), newCellValue)
                 .stream()
-                .anyMatch(movePoint -> movePoint.getCellLocation() == cellLocation && movePoint.getCellsToFlip().size() > 0);
+                .anyMatch(movePoint -> movePoint.getCellLocation().equals(cellLocation) && movePoint.getCellsToFlip().size() > 0);
     }
 }

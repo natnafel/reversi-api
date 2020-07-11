@@ -41,7 +41,7 @@ public class GameController {
 		return gameService.startAwayGame(awayGameRequest);
 	}
 
-	@PostMapping("/games/{gameUUID}/move")
+	@PostMapping("/games/{gameUUID}/moves")
 	public NewGameAndMoveResp makeMove(@PathVariable UUID gameUUID, @RequestBody CellLocation newMoveLocation) {
 		return gameService.makeMoveForOpponent(gameUUID, newMoveLocation);
 	}

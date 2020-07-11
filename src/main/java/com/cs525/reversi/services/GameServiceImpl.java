@@ -10,6 +10,7 @@ import com.cs525.reversi.exception.AlgorithmCodeDoesntExistException;
 import com.cs525.reversi.exception.IllegalMoveException;
 import com.cs525.reversi.exception.ProtocolCodeDoesntExistException;
 import com.cs525.reversi.models.*;
+import com.cs525.reversi.repositories.CellLocationRepository;
 import com.cs525.reversi.req.AwayGameRequest;
 import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.req.GameSideDesicion;
@@ -34,6 +35,7 @@ public class GameServiceImpl implements GameService {
 	private final Mapper mapper;
 	private final GameRepository gameRepo;
 	private final UserRepository userRepo;
+	private final CellLocationRepository cellLocationRepo;
 	private final GameModerator gameModerator;
 	private final AlgorithmFactory algorithmFactory;
 	private final AwayGameFactory awayGameFactory;
@@ -48,11 +50,12 @@ public class GameServiceImpl implements GameService {
 	private static final AlgorithmType DEFAULT_SERVER_ALGORITHM = AlgorithmType.Gredy;
 
 	public GameServiceImpl(GameRepository gameRepo, UserRepository userRepo, MoveRepository moveRepo, AwayGameFactory awayGameFactory,
-						   Mapper mapper, GameModerator gameModerator, AlgorithmFactory algorithmFactory) {
+						   Mapper mapper, GameModerator gameModerator, AlgorithmFactory algorithmFactory, CellLocationRepository cellLocationRepo) {
 		this.gameRepo = gameRepo;
 		this.userRepo = userRepo;
 		this.gameModerator = gameModerator;
 		this.moveRepo = moveRepo;
+		this.cellLocationRepo = cellLocationRepo;
 		this.mapper = mapper;
 		this.algorithmFactory = algorithmFactory;
 		this.awayGameFactory = awayGameFactory;
@@ -173,7 +176,11 @@ public class GameServiceImpl implements GameService {
 			throw new IllegalMoveException(newMoveLocation);
 		}
 
-		gameModerator.applyMove(game, gameModerator.moveScoreForNewPiece(game, newMoveLocation, game.getPlayer2()));
+		MoveScore moveScoreOpponent = gameModerator.moveScoreForNewPiece(game, newMoveLocation, game.getPlayer2());
+		gameModerator.applyMove(game, moveScoreOpponent);
+		cellLocationRepo.saveAll(moveScoreOpponent.getCellsToFlip());
+		moveRepo.save(new Move(game, game.getPlayer2(), moveScoreOpponent.getCellLocation().getRow(),
+				moveScoreOpponent.getCellLocation().getCol(), moveScoreOpponent.getCellsToFlip()));
 
 		String infoMessage = LAST_MOVE_SUCCESSFUL_GAME_OVER;
 		ResponseStatus status = ResponseStatus.GAME_OVER;
@@ -182,7 +189,11 @@ public class GameServiceImpl implements GameService {
 		if (game.getStatus() != GameStatus.CLOSED){
 			infoMessage = MOVE_MADE_SUCCESSFULLY_MESSAGE;
 			status = ResponseStatus.SUCCESSFUL;
-			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
+			MoveScore moveScoreServer = makeMoveForServer(game);
+			serverMoveCellLocation = moveScoreServer.getCellLocation();
+			cellLocationRepo.saveAll(moveScoreServer.getCellsToFlip());
+			moveRepo.save(new Move(game, game.getPlayer1(), moveScoreServer.getCellLocation().getRow(),
+					moveScoreServer.getCellLocation().getCol(), moveScoreServer.getCellsToFlip()));
 		}
 
 		gameRepo.save(game);

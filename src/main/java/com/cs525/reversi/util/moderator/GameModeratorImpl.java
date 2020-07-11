@@ -40,6 +40,8 @@ public class GameModeratorImpl implements GameModerator {
 
     @Override
     public void applyMove(Game game, MoveScore moveScore) {
+        game.changeCellValue(moveScore.getCellLocation().getRow(), moveScore.getCellLocation().getCol(), moveScore.getNewCellValue());
+
         for (CellLocation flip : moveScore.getCellsToFlip()) {
             game.changeCellValue(flip.getRow(), flip.getCol(), moveScore.getNewCellValue());
         }
@@ -135,8 +137,8 @@ public class GameModeratorImpl implements GameModerator {
     }
 
     private CellValue getPlayerCellValue(Game game, User player) {
-        // player 1 is black and player 2 is white
-        return game.getPlayer1().getUsername().equals(player.getUsername()) ? CellValue.BLACK : CellValue.WHITE;
+        // player 1 is white and player 2 is black
+        return game.getPlayer1().getUsername().equals(player.getUsername()) ? CellValue.WHITE : CellValue.BLACK;
     }
 
     private CellValue getCellValue(List<MatrixRow> rows, int row, int col) {
