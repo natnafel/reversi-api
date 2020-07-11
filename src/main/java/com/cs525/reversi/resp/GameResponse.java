@@ -15,7 +15,6 @@ import lombok.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameResponse{
-	private int id;
 	private UUID uuid;
 	private User player1;
 	private User player2;

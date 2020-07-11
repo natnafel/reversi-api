@@ -3,7 +3,6 @@ package com.cs525.reversi.controllers;
 import java.util.List;
 import java.util.UUID;
 
-import com.cs525.reversi.models.Game;
 import com.cs525.reversi.req.NewGame;
 import com.cs525.reversi.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +50,8 @@ public class GameController {
 	}
 
 	@GetMapping("/games")
-	public List<Game> getListOfGames(){
-		return gameService.getAll();
+	public List<GameResponse> getListOfGames(){
+		return gameService.getAllGames();
 	}
 
 }

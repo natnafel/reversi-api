@@ -29,5 +29,5 @@ public interface GameService {
 
 	List<LookupResp> getSupportedAlgorithms();
 
-	List<Game> getAll();
+	List<GameResponse> getAllGames();
 }
