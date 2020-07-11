@@ -115,14 +115,26 @@ public class GameServiceImpl implements GameService {
 		return gameResponse;
 	}
 
-	private List<List<CellValue>> toBoard(List<MatrixRow> rows) {
-		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList());
-	}
-
 	@Override
 	public List<LookupResp> getSupportedAlgorithms() {
 		return Arrays.stream(AlgorithmType.values()).map(e -> new LookupResp(e.getName(), e.getCode()))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GameResponse> getAllGames() {
+
+		List<GameResponse> gameResponses = new ArrayList<>();
+		List<Game> games = gameRepo.findAll();
+
+		for (Game game : games) {
+			GameResponse gameResponse = mapper.gameModelToResponse(game);
+			gameResponse.setBoard(toBoard(game.getRows()));
+			gameResponse.setLastMoveId(-1); // too expensive to compute for each game
+			gameResponses.add(gameResponse);
+		}
+
+		return gameResponses;
 	}
 
 	@Override
@@ -196,15 +208,6 @@ public class GameServiceImpl implements GameService {
 				.collect(Collectors.toList());
 	}
 
-	private MoveScore makeMoveForServer(Game game){
-		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
-				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), getDefaultAlgorithm());
-
-		gameModerator.applyMove(game, serverMove);
-
-		return serverMove;
-	}
-
 	@Async
 	void playAwayGame(Game game, AwayGameRequest awayGameRequest){
 		awayGameFactory.getAwayGame(
@@ -219,6 +222,19 @@ public class GameServiceImpl implements GameService {
 								.findAny()
 								.orElseThrow(() -> new AlgorithmCodeDoesntExistException(awayGameRequest.getAlgorithm()))),
 						awayGameRequest.isMakeFirstMove());
+	}
+
+	private List<List<CellValue>> toBoard(List<MatrixRow> rows) {
+		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList());
+	}
+
+	private MoveScore makeMoveForServer(Game game){
+		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
+				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), getDefaultAlgorithm());
+
+		gameModerator.applyMove(game, serverMove);
+
+		return serverMove;
 	}
 
 }

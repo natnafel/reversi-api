@@ -32,4 +32,6 @@ public interface GameService {
 	User getDefaultPlayer();
 
     List<LookupResp> getSupportedProtocols();
+
+	List<GameResponse> getAllGames();
 }
