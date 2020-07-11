@@ -36,7 +36,7 @@ public class GameController {
 		return gameService.createNewGame(newGameForm);
 	}
 
-	@PostMapping(value = "/games", params = "type=away")
+	@PostMapping(value = "/games/away")
 	public AwayGameResponse startAwayGame(@RequestBody AwayGameRequest awayGameRequest) {
 		return gameService.startAwayGame(awayGameRequest);
 	}
