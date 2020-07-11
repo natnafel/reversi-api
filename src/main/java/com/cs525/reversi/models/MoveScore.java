@@ -9,6 +9,8 @@ import java.util.List;
 @Data
 public class MoveScore {
     @NonNull
+    private CellValue newCellValue;
+    @NonNull
     private CellLocation cellLocation;
     @NonNull
     private List<CellLocation> cellsToFlip;

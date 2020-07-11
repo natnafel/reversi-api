@@ -66,7 +66,7 @@ public class Game {
     private List<MatrixRow> rows;	
 
 	public void changeCellValue (Integer cellRow , Integer cellCol , CellValue value) {
-		rows.get(cellRow).getCells().add(cellCol, value);
+		rows.get(cellRow).getCells().set(cellCol, value);
 	}
 	
 	public void setDefaultCells() {
