@@ -1,7 +1,10 @@
 package com.cs525.reversi.resp;
 
 
-import com.cs525.reversi.models.User;
+import java.util.List;
+
+import com.cs525.reversi.req.CellLocation;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,4 +16,6 @@ public class MoveResponse {
 	    private UserResponse player;
 	    private int row;
 	    private int col;
+	    private List<CellLocation> cellsToFlip;
+
 }
