@@ -6,146 +6,65 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.cs525.reversi.exception.AlgorithmCodeDoesntExistException;
+import com.cs525.reversi.exception.IllegalMoveException;
+import com.cs525.reversi.exception.ProtocolCodeDoesntExistException;
+import com.cs525.reversi.models.*;
+import com.cs525.reversi.repositories.CellLocationRepository;
+import com.cs525.reversi.req.AwayGameRequest;
+import com.cs525.reversi.req.CellLocation;
+import com.cs525.reversi.req.GameSideDesicion;
+import com.cs525.reversi.resp.*;
+import com.cs525.reversi.util.factory.AwayGameFactory;
+import com.cs525.reversi.util.moderator.GameModerator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.cs525.reversi.config.Mapper;
 import com.cs525.reversi.exception.UsernameDoesNotExist;
-import com.cs525.reversi.models.AlgorithmType;
-import com.cs525.reversi.models.CellValue;
-import com.cs525.reversi.models.Game;
-import com.cs525.reversi.models.GameBuilder;
-import com.cs525.reversi.models.GameStatus;
-import com.cs525.reversi.models.LookupResp;
-import com.cs525.reversi.models.MatrixRow;
-import com.cs525.reversi.models.Move;
-import com.cs525.reversi.models.MoveScore;
-import com.cs525.reversi.models.ReversiGameBuilder;
-import com.cs525.reversi.models.User;
 import com.cs525.reversi.repositories.GameRepository;
 import com.cs525.reversi.repositories.MoveRepository;
 import com.cs525.reversi.repositories.UserRepository;
-import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.req.NewGame;
-import com.cs525.reversi.resp.GameResponse;
-import com.cs525.reversi.resp.Info;
-import com.cs525.reversi.resp.MoveResponse;
-import com.cs525.reversi.resp.NewGameAndMoveResp;
-import com.cs525.reversi.resp.ResponseStatus;
-import com.cs525.reversi.util.Pair;
-import com.cs525.reversi.util.iterators.CellIterator;
-import com.cs525.reversi.util.iterators.EastIterator;
-import com.cs525.reversi.util.iterators.NorthEastIterator;
-import com.cs525.reversi.util.iterators.NorthIterator;
-import com.cs525.reversi.util.iterators.NorthWestIterator;
-import com.cs525.reversi.util.iterators.SouthEastIterator;
-import com.cs525.reversi.util.iterators.SouthIterator;
-import com.cs525.reversi.util.iterators.SouthWestIterator;
-import com.cs525.reversi.util.iterators.WestIterator;
-import com.cs525.reversi.util.rules.EmptyRule;
-import com.cs525.reversi.util.rules.NewValueNotEmptyRule;
-import com.cs525.reversi.util.rules.OpenGameRule;
-import com.cs525.reversi.util.rules.ResultsInPointsRule;
-import com.cs525.reversi.util.rules.Rule;
-
 
 @Service
 public class GameServiceImpl implements GameService {
 
-
-	@Autowired
-	private MoveRepository moveRepo;
-	@Autowired
-	private Mapper mapper;
+	private final MoveRepository moveRepo;
+	private final Mapper mapper;
 	private final GameRepository gameRepo;
 	private final UserRepository userRepo;
-	private final Rule gameRule;
+	private final CellLocationRepository cellLocationRepo;
+	private final GameModerator gameModerator;
+	private final AlgorithmFactory algorithmFactory;
+	private final AwayGameFactory awayGameFactory;
 
 	@Value("${reversi.default-player.username}")
 	private String defaultPlayerUsername;
 
-	private static final String GAME_CREATED_SUCCESSFULLY_MESSAGE = "Game created successfully";
+	private static final String GAME_CREATED_SUCCESSFULLY_MESSAGE = "Game created successfully. Waiting for your next move.";
+	private static final String MOVE_MADE_SUCCESSFULLY_MESSAGE = "Move made successfully. Waiting for your next move";
+	private static final String LAST_MOVE_SUCCESSFUL_GAME_OVER = "Game over. Last move was made successfully.";
 	private static final int DEFAULT_START_SCORE = 2;
+	private static final AlgorithmType DEFAULT_SERVER_ALGORITHM = AlgorithmType.Gredy;
 
-	public GameServiceImpl(GameRepository gameRepo, UserRepository userRepo, EmptyRule emptyRule,
-			OpenGameRule openGameRule, NewValueNotEmptyRule newValueNotEmptyRule,
-			ResultsInPointsRule resultsInPointsRule) {
+	public GameServiceImpl(GameRepository gameRepo, UserRepository userRepo, MoveRepository moveRepo, AwayGameFactory awayGameFactory,
+						   Mapper mapper, GameModerator gameModerator, AlgorithmFactory algorithmFactory, CellLocationRepository cellLocationRepo) {
 		this.gameRepo = gameRepo;
 		this.userRepo = userRepo;
-		this.gameRule = emptyRule;
-		emptyRule.setNext(openGameRule);
-		openGameRule.setNext(newValueNotEmptyRule);
-		newValueNotEmptyRule.setNext(resultsInPointsRule);
-	}
-
-	public List<CellIterator> cellIterators(List<MatrixRow> rows) {
-		List<CellIterator> iterators = new ArrayList<>();
-		iterators.add(new NorthIterator(rows));
-		iterators.add(new SouthIterator(rows));
-		iterators.add(new WestIterator(rows));
-		iterators.add(new EastIterator(rows));
-		iterators.add(new NorthEastIterator(rows));
-		iterators.add(new SouthEastIterator(rows));
-		iterators.add(new SouthWestIterator(rows));
-		iterators.add(new NorthWestIterator(rows));
-		return iterators;
-	}
-
-	private List<CellLocation> flipLocations(CellIterator iterator, CellLocation startCell, CellValue newCellValue) {
-		List<CellLocation> flipLocations = new ArrayList<>();
-		boolean seenCellWithSameValue = false;
-
-		iterator.setPosition(startCell.getRow(), startCell.getCol());
-
-		while (iterator.hasNext()) {
-			Pair<CellLocation, CellValue> next = iterator.next();
-			if (next.getValue() == CellValue.EMPTY)
-				break;
-			if (next.getValue() == newCellValue) {
-				seenCellWithSameValue = true;
-				break;
-			}
-			flipLocations.add(next.getKey());
-		}
-
-		return seenCellWithSameValue ? flipLocations : new ArrayList<>();
-	}
-
-	@Override
-	public List<MoveScore> nextPossibleMoves(List<MatrixRow> rows, CellValue newCellValue) {
-		List<MoveScore> result = new ArrayList<>();
-
-		List<CellIterator> iterators = cellIterators(rows);
-		int rowSize = rows.size();
-		int colSize = rows.get(0).getCells().size();
-
-		for (int row = 0; row < rowSize; row++) {
-			for (int col = 0; col < colSize; col++) {
-				List<CellLocation> cellsToFlip = new ArrayList<>();
-				CellLocation newCellLocation = new CellLocation(row, col);
-				for (CellIterator iterator : iterators) {
-					cellsToFlip.addAll(flipLocations(iterator, newCellLocation, newCellValue));
-				}
-				if (cellsToFlip.size() > 0) {
-					result.add(new MoveScore(newCellLocation, cellsToFlip));
-				}
-			}
-		}
-
-		return result;
-	}
-
-	@Override
-	public boolean validateMove(Game game, CellLocation cellLocation, CellValue newCellValue) {
-		return gameRule.isValid(game, cellLocation, newCellValue);
+		this.gameModerator = gameModerator;
+		this.moveRepo = moveRepo;
+		this.cellLocationRepo = cellLocationRepo;
+		this.mapper = mapper;
+		this.algorithmFactory = algorithmFactory;
+		this.awayGameFactory = awayGameFactory;
 	}
 
 	@Override
 	public NewGameAndMoveResp createNewGame(NewGame newGameForm) {
 
-		User player1 = userRepo.findByUsername(defaultPlayerUsername)
-				.orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername));
+		User player1 = getDefaultPlayer();
 		User player2 = userRepo.findByUsername(newGameForm.getUserName())
 				.orElseGet(() -> userRepo.save(new User(UUID.randomUUID(), newGameForm.getUserName())));
 
@@ -154,13 +73,20 @@ public class GameServiceImpl implements GameService {
 		Game game = reversiGameBuilder.buildPlayerOne(player1).buildPlayerTwo(player2).buildGameStatus(GameStatus.OPEN)
 				.buildGameUUID().buildBoardGame().getGame();
 
-		gameRepo.save(game);
+		CellLocation serverMoveCellLocation = null;
+		int homeScore = DEFAULT_START_SCORE;
+		int awayScore = DEFAULT_START_SCORE;
 
+		gameRepo.saveAndFlush(game);
 
+		if (newGameForm.getFirstMove() == GameSideDesicion.HOME) {
+			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
+			homeScore = gameModerator.playerScore(game, game.getPlayer1());
+			awayScore = gameModerator.playerScore(game, game.getPlayer2());
+		}
 
-		// TODO handle scenario when newGame.firstMove == HOME (API makes move) as a result board, homeTotalScore and awayTotalScore is adjusted
 		return new NewGameAndMoveResp(new Info(ResponseStatus.SUCCESSFUL, GAME_CREATED_SUCCESSFULLY_MESSAGE), game.getUuid(),
-				DEFAULT_START_SCORE, DEFAULT_START_SCORE, null,
+				homeScore, awayScore, serverMoveCellLocation,
 				toBoard(game.getRows()));
 
 	}
@@ -168,35 +94,163 @@ public class GameServiceImpl implements GameService {
 	@Override
 	public List<MoveResponse> getMoves(UUID gameuuid) {
 		Game game = gameRepo.findByUuid(gameuuid);
-		if(game == null) return new ArrayList<>();
+		if (game == null)
+			return new ArrayList<>();
 		List<Move> moves = moveRepo.findByGameId(game.getId());
 		List<MoveResponse> moveResponses = new ArrayList<>();
-		for(Move move : moves) {
-			moveResponses.add(new MoveResponse(move.getId(), mapper.userToUserResponse(move.getPlayer()), move.getRoww(), move.getCol()));
+		for (Move move : moves) {
+			moveResponses.add(new MoveResponse(move.getId(), mapper.userToUserResponse(move.getPlayer()),
+					move.getRoww(), move.getCol(), move.getCellsToFlip()));
 		}
 		return moveResponses;
 	}
-	
+
 	@Override
 	public GameResponse getGame(UUID uuid) {
 		Game game = gameRepo.findByUuid(uuid);
-		if(game == null) return null;
+		if (game == null)
+			return null;
 		Move move = moveRepo.findTopByOrderByIdDesc();
 		GameResponse gameResponse = mapper.gameModelToResponse(game);
 		gameResponse.setBoard(toBoard(game.getRows()));
-		if(move != null) gameResponse.setLastMoveId(move.getId());
+		if (move != null)
+			gameResponse.setLastMoveId(move.getId());
 		return gameResponse;
+	}
+
+	@Override
+	public List<LookupResp> getSupportedAlgorithms() {
+		return Arrays.stream(AlgorithmType.values()).map(e -> new LookupResp(e.getName(), e.getCode()))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GameResponse> getAllGames() {
+
+		List<GameResponse> gameResponses = new ArrayList<>();
+		List<Game> games = gameRepo.findAll();
+
+		for (Game game : games) {
+			GameResponse gameResponse = mapper.gameModelToResponse(game);
+			gameResponse.setBoard(toBoard(game.getRows()));
+			gameResponse.setLastMoveId(-1); // too expensive to compute for each game
+			gameResponses.add(gameResponse);
+		}
+
+		return gameResponses;
+	}
+
+	@Override
+	public AwayGameResponse startAwayGame(AwayGameRequest awayGameRequest) {
+		String player2Username = String.format("%s:%s", awayGameRequest.getAddress(), awayGameRequest.getPort());
+
+		User player1 = getDefaultPlayer();
+		User player2 = userRepo.findByUsername(player2Username)
+				.orElseGet(() -> userRepo.save(new User(UUID.randomUUID(), player2Username)));
+
+		Game game = new ReversiGameBuilder()
+				.buildPlayerOne(player1)
+				.buildPlayerTwo(player2)
+				.buildGameStatus(GameStatus.OPEN)
+				.buildGameUUID()
+				.buildBoardGame()
+				.getGame();
+
+		gameRepo.save(game);
+
+		new Thread(() -> playAwayGame(game, awayGameRequest)).start();
+
+		return new AwayGameResponse(game.getUuid());
+	}
+
+	@Override
+	public NewGameAndMoveResp makeMoveForOpponent(UUID gameUUID, CellLocation newMoveLocation) {
+		return makeMoveForOpponent(gameRepo.findByUuid(gameUUID), newMoveLocation);
+
+	}
+
+	@Override
+	public NewGameAndMoveResp makeMoveForOpponent(Game game, CellLocation newMoveLocation) {
+		// player 2 is client
+		if (!gameModerator.validateMove(game, newMoveLocation, game.getPlayer2())) {
+			throw new IllegalMoveException(newMoveLocation);
+		}
+
+		MoveScore moveScoreOpponent = gameModerator.moveScoreForNewPiece(game, newMoveLocation, game.getPlayer2());
+		gameModerator.applyMove(game, moveScoreOpponent);
+		cellLocationRepo.saveAll(moveScoreOpponent.getCellsToFlip());
+		moveRepo.save(new Move(game, game.getPlayer2(), moveScoreOpponent.getCellLocation().getRow(),
+				moveScoreOpponent.getCellLocation().getCol(), moveScoreOpponent.getCellsToFlip()));
+
+		gameRepo.saveAndFlush(game);
+		cellLocationRepo.flush();
+		moveRepo.flush();
+
+		String infoMessage = LAST_MOVE_SUCCESSFUL_GAME_OVER;
+		ResponseStatus status = ResponseStatus.GAME_OVER;
+		CellLocation serverMoveCellLocation = null;
+
+		if (game.getStatus() != GameStatus.CLOSED){
+			infoMessage = MOVE_MADE_SUCCESSFULLY_MESSAGE;
+			status = ResponseStatus.SUCCESSFUL;
+			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
+		}
+
+		return new NewGameAndMoveResp(new Info(status, infoMessage), game.getUuid(),
+				gameModerator.playerScore(game, game.getPlayer1()), gameModerator.playerScore(game, game.getPlayer2()),
+				serverMoveCellLocation, toBoard(game.getRows()));
+	}
+
+	@Override
+	public User getDefaultPlayer() {
+		return userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername));
+	}
+
+	private Algorithm getDefaultAlgorithm(){
+		return algorithmFactory.getAlgorithm(DEFAULT_SERVER_ALGORITHM);
+	}
+
+	@Override
+	public List<LookupResp> getSupportedProtocols() {
+		return Arrays.stream(Protocol.values())
+				.map(protocol -> new LookupResp(protocol.getName(), protocol.getCode()))
+				.collect(Collectors.toList());
+	}
+
+	void playAwayGame(Game game, AwayGameRequest awayGameRequest){
+		awayGameFactory.getAwayGame(
+				Arrays.stream(Protocol.values())
+						.filter(protocol -> protocol.getCode().equals(awayGameRequest.getProtocol()))
+						.findAny()
+						.orElseThrow(() -> new ProtocolCodeDoesntExistException(awayGameRequest.getProtocol())))
+				.play(game, awayGameRequest.getAddress(), awayGameRequest.getPort(),
+						algorithmFactory.getAlgorithm(
+								Arrays.stream(AlgorithmType.values())
+								.filter(algorithmType -> algorithmType.getCode().equals(awayGameRequest.getAlgorithm()))
+								.findAny()
+								.orElseThrow(() -> new AlgorithmCodeDoesntExistException(awayGameRequest.getAlgorithm()))),
+						awayGameRequest.isMakeFirstMove());
 	}
 
 	private List<List<CellValue>> toBoard(List<MatrixRow> rows) {
 		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList());
 	}
 
-	@Override
-	public List<LookupResp> getSupportedAlgorithms() {
-		// TODO Auto-generated method stub
-		return Arrays.stream(AlgorithmType.values()).map(e -> new LookupResp(e.getName(), e.getCode()))
-				.collect(Collectors.toList());
+	private MoveScore makeMoveForServer(Game game){
+		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
+				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), getDefaultAlgorithm());
+
+		gameModerator.applyMove(game, serverMove);
+
+		gameRepo.save(game);
+		cellLocationRepo.saveAll(serverMove.getCellsToFlip());
+		moveRepo.save(new Move(game, game.getPlayer1(), serverMove.getCellLocation().getRow(), serverMove.getCellLocation().getCol(), serverMove.getCellsToFlip()));
+
+		cellLocationRepo.flush();
+		moveRepo.flush();
+		gameRepo.flush();
+
+		return serverMove;
 	}
 
 }
