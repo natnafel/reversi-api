@@ -79,7 +79,11 @@ public class GameServiceImpl implements GameService {
 		gameRepo.saveAndFlush(game);
 
 		if (newGameForm.getFirstMove() == GameSideDesicion.HOME) {
-			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
+			serverMoveCellLocation = null;
+			MoveScore serverMoveScore = makeMoveForServer(game);
+			if (serverMoveScore != null) {
+				serverMoveCellLocation = serverMoveScore.getCellLocation();
+			}
 			homeScore = gameModerator.playerScore(game, game.getPlayer1());
 			awayScore = gameModerator.playerScore(game, game.getPlayer2());
 		}
@@ -169,7 +173,7 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
-	public void makeMoveOnlyForOpponent(Game game, CellLocation newMoveLocation){
+	public void makeMoveOnlyForOpponent(Game game, CellLocation newMoveLocation) {
 		// player 2 is client
 		if (!gameModerator.validateMove(game, newMoveLocation, game.getPlayer2())) {
 			throw new IllegalMoveException(newMoveLocation);
@@ -198,7 +202,10 @@ public class GameServiceImpl implements GameService {
 		if (game.getStatus() != GameStatus.CLOSED){
 			infoMessage = MOVE_MADE_SUCCESSFULLY_MESSAGE;
 			status = ResponseStatus.SUCCESSFUL;
-			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
+			MoveScore serverMoveScore = makeMoveForServer(game);
+			if (serverMoveScore != null) {
+				serverMoveCellLocation = serverMoveScore.getCellLocation();
+			}
 		}
 
 		return new NewGameAndMoveResp(new Info(status, infoMessage), game.getUuid(),
@@ -246,15 +253,17 @@ public class GameServiceImpl implements GameService {
 		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
 				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), algorithm);
 
-		gameModerator.applyMove(game, serverMove);
+		if (serverMove != null) {
+			gameModerator.applyMove(game, serverMove);
 
-		gameRepo.save(game);
-		cellLocationRepo.saveAll(serverMove.getCellsToFlip());
-		moveRepo.save(new Move(game, game.getPlayer1(), serverMove.getCellLocation().getRow(), serverMove.getCellLocation().getCol(), serverMove.getCellsToFlip()));
+			gameRepo.save(game);
+			cellLocationRepo.saveAll(serverMove.getCellsToFlip());
+			moveRepo.save(new Move(game, game.getPlayer1(), serverMove.getCellLocation().getRow(), serverMove.getCellLocation().getCol(), serverMove.getCellsToFlip()));
 
-		cellLocationRepo.flush();
-		moveRepo.flush();
-		gameRepo.flush();
+			cellLocationRepo.flush();
+			moveRepo.flush();
+			gameRepo.flush();
+		}
 
 		return serverMove;
 	}

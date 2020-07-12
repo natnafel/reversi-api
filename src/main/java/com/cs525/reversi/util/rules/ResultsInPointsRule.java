@@ -16,6 +16,7 @@ public class ResultsInPointsRule extends Rule {
 
     @Override
     public boolean applyRule(Game game, CellLocation cellLocation, CellValue newCellValue) {
+        if (cellLocation.getRow() < 0 && cellLocation.getCol() < 0) return true;
         return gameModerator.nextPossibleMoves(game.getRows(), newCellValue)
                 .stream()
                 .anyMatch(movePoint -> movePoint.getCellLocation().equals(cellLocation) && movePoint.getCellsToFlip().size() > 0);
