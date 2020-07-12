@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 public class EmptyRule extends Rule {
     @Override
     public boolean applyRule(Game game, CellLocation cellLocation, CellValue newCellValue) {
-        return game.getRows().get(cellLocation.getRow()).getCells().get(cellLocation.getCol()) == CellValue.EMPTY;
+        return game.getRows().get(cellLocation.getRow()).getCells().get(cellLocation.getCol()).getCellValue() == CellValue.EMPTY;
     }
 }

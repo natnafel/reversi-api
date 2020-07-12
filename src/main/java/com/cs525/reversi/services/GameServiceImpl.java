@@ -18,7 +18,6 @@ import com.cs525.reversi.resp.*;
 import com.cs525.reversi.util.factory.AwayGameFactory;
 import com.cs525.reversi.util.moderator.GameModerator;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.cs525.reversi.config.Mapper;
@@ -128,7 +127,7 @@ public class GameServiceImpl implements GameService {
 	public List<GameResponse> getAllGames() {
 
 		List<GameResponse> gameResponses = new ArrayList<>();
-		List<Game> games = gameRepo.findAll();
+		List<Game> games = gameRepo.findByOrderByIdDesc();
 
 		for (Game game : games) {
 			GameResponse gameResponse = mapper.gameModelToResponse(game);
@@ -239,13 +238,13 @@ public class GameServiceImpl implements GameService {
 	}
 
 	private List<List<CellValue>> toBoard(List<MatrixRow> rows) {
-		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList());
+		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells().stream().map(CellValueClass::getCellValue).collect(Collectors.toList())))).collect(Collectors.toList());
 	}
 
 	@Override
-	public MoveScore makeMoveForServer(Game game){
+	public MoveScore makeMoveForServer(Game game, Algorithm algorithm) {
 		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
-				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), getDefaultAlgorithm());
+				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), algorithm);
 
 		gameModerator.applyMove(game, serverMove);
 
@@ -258,6 +257,11 @@ public class GameServiceImpl implements GameService {
 		gameRepo.flush();
 
 		return serverMove;
+	}
+
+	@Override
+	public MoveScore makeMoveForServer(Game game){
+		return makeMoveForServer(game, getDefaultAlgorithm());
 	}
 
 }

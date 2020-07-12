@@ -122,6 +122,8 @@ public class GameModeratorImpl implements GameModerator {
 
         iterator.setPosition(startCell.getRow(), startCell.getCol());
 
+        if (iterator.isCurrentOccupied()) return new ArrayList<>();
+
         while (iterator.hasNext()) {
             Pair<CellLocation, CellValue> next = iterator.next();
             if (next.getValue() == CellValue.EMPTY)
@@ -138,11 +140,11 @@ public class GameModeratorImpl implements GameModerator {
 
     private CellValue getPlayerCellValue(Game game, User player) {
         // player 1 is white and player 2 is black
-        return game.getPlayer1().getUsername().equals(player.getUsername()) ? CellValue.WHITE : CellValue.BLACK;
+        return game.getPlayer1().getUsername().equals(player.getUsername()) ? CellValue.BLACK : CellValue.WHITE;
     }
 
     private CellValue getCellValue(List<MatrixRow> rows, int row, int col) {
-        return rows.get(row).getCells().get(col);
+        return rows.get(row).getCells().get(col).getCellValue();
     }
 
     public boolean isBoardFull(List<MatrixRow> rows) {
