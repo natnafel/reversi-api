@@ -140,7 +140,7 @@ public class GameModeratorImpl implements GameModerator {
 
     private CellValue getPlayerCellValue(Game game, User player) {
         // player 1 is white and player 2 is black
-        return game.getPlayer1().getUsername().equals(player.getUsername()) ? CellValue.BLACK : CellValue.WHITE;
+        return game.getPlayer1().getUsername().equals(player.getUsername()) ? CellValue.WHITE : CellValue.BLACK;
     }
 
     private CellValue getCellValue(List<MatrixRow> rows, int row, int col) {
