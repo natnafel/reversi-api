@@ -31,12 +31,7 @@ public class G1RestAwayGame extends AwayGame<UUID> {
 
 	@Override
 	protected CellLocation makeAMove(String hostName, int port, UUID identifier, CellLocation cellLocation) {
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		G1CellLocation g1CellLocation = restTemplate
 				.postForEntity(String.format("%s/play", hostName, cellLocation.getRow(), cellLocation.getCol()),
 						cellLocation, G1CellLocation.class)
