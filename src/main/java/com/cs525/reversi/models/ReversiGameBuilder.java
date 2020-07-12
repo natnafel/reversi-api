@@ -49,9 +49,9 @@ public class ReversiGameBuilder implements GameBuilder {
 
 			for (int i = 1; i <= 8; i++) {
 				MatrixRow row = new MatrixRow();
-				List<CellValue> cells = new ArrayList<>();
+				List<CellValueClass> cells = new ArrayList<>();
 				for (int j = 1; j <= 8; j++) {
-						cells.add(CellValue.EMPTY);
+						cells.add(new CellValueClass(CellValue.EMPTY));
 				}
 				row.setCells(cells);
 				rows.add(row);

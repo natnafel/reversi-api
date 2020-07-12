@@ -33,6 +33,8 @@ public interface GameService {
 
 	MoveScore makeMoveForServer(Game game);
 
+	MoveScore makeMoveForServer(Game game, Algorithm algorithm);
+
 	User getDefaultPlayer();
 
     List<LookupResp> getSupportedProtocols();

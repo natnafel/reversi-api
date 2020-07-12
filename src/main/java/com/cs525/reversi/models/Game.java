@@ -4,19 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -63,10 +51,11 @@ public class Game {
 	private GameStatus status;
 
 	@OneToMany(cascade = CascadeType.ALL)
+	@OrderBy("id")
     private List<MatrixRow> rows;	
 
 	public void changeCellValue (Integer cellRow , Integer cellCol , CellValue value) {
-		rows.get(cellRow).getCells().set(cellCol, value);
+		rows.get(cellRow).getCells().get(cellCol).setCellValue(value);
 	}
 	
 	public void setDefaultCells() {
