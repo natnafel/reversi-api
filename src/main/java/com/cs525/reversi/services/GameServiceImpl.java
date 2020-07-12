@@ -18,7 +18,6 @@ import com.cs525.reversi.resp.*;
 import com.cs525.reversi.util.factory.AwayGameFactory;
 import com.cs525.reversi.util.moderator.GameModerator;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.cs525.reversi.config.Mapper;
@@ -128,7 +127,7 @@ public class GameServiceImpl implements GameService {
 	public List<GameResponse> getAllGames() {
 
 		List<GameResponse> gameResponses = new ArrayList<>();
-		List<Game> games = gameRepo.findAll();
+		List<Game> games = gameRepo.findByOrderByIdDesc();
 
 		for (Game game : games) {
 			GameResponse gameResponse = mapper.gameModelToResponse(game);
