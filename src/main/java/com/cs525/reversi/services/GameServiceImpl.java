@@ -245,7 +245,7 @@ public class GameServiceImpl implements GameService {
 	@Override
 	public MoveScore makeMoveForServer(Game game, Algorithm algorithm) {
 		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
-				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), getDefaultAlgorithm());
+				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), algorithm);
 
 		gameModerator.applyMove(game, serverMove);
 
