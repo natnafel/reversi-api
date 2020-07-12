@@ -29,7 +29,15 @@ public class G2RestAwayGame extends AwayGame<UUID> {
     @Override
     protected CellLocation makeAMove(String hostName, int port, UUID identifier, CellLocation cellLocation) {
 
-        G2CellLocation g2CellLocation = restTemplate.exchange(String.format("%s:%s/game/postmove?x=%s&y=%s", hostName, port, cellLocation.getRow(), cellLocation.getCol()),
+        int row = -1;
+        int col = -1;
+
+        if (cellLocation != null) {
+            row = cellLocation.getRow();
+            col = cellLocation.getCol();
+        }
+
+        G2CellLocation g2CellLocation = restTemplate.exchange(String.format("%s:%s/game/postmove?x=%s&y=%s", hostName, port, row, col),
                 HttpMethod.GET, null, G2CellLocation.class).getBody();
 
         return new CellLocation(g2CellLocation.getX(), g2CellLocation.getY()) ;

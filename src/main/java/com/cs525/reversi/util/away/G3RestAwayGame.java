@@ -53,6 +53,9 @@ public class G3RestAwayGame extends AwayGame<UUID> {
 
     @Override
     protected CellLocation makeAMove(String hostName, int port, UUID identifier, CellLocation cellLocation) {
+        if (cellLocation == null){
+            cellLocation = new CellLocation(-1, -1);
+        }
         NewGameAndMoveResp response =  restTemplate.exchange(String.format("%s:%s/api/games/%s/moves", hostName, port, identifier), HttpMethod.POST,
                 new HttpEntity<>(cellLocation), NewGameAndMoveResp.class).getBody();
         return response.getHomeNewPiece();

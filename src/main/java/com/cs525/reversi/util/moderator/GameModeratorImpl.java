@@ -5,6 +5,7 @@ import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.util.Pair;
 import com.cs525.reversi.util.iterators.*;
 import com.cs525.reversi.util.rules.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -15,13 +16,18 @@ public class GameModeratorImpl implements GameModerator {
 
     private final Rule gameRule;
 
+    @Value("${reversi.default-player.is-black}")
+    private boolean defaultPlayerIsBlack;
+
     public GameModeratorImpl(EmptyRule emptyRule, OpenGameRule openGameRule,
                              NewValueNotEmptyRule newValueNotEmptyRule,
+                             MustPlayTurnRule mustPlayTurnRule,
                              ResultsInPointsRule resultsInPointsRule) {
         gameRule = emptyRule;
         emptyRule.setNext(openGameRule);
         openGameRule.setNext(newValueNotEmptyRule);
         newValueNotEmptyRule.setNext(resultsInPointsRule);
+        resultsInPointsRule.setNext(mustPlayTurnRule);
     }
 
     @Override
@@ -139,8 +145,8 @@ public class GameModeratorImpl implements GameModerator {
     }
 
     private CellValue getPlayerCellValue(Game game, User player) {
-        // player 1 is white and player 2 is black
-        return game.getPlayer1().getUsername().equals(player.getUsername()) ? CellValue.BLACK : CellValue.WHITE;
+        boolean isDefaultPlayer = game.getPlayer1().getUsername().equals(player.getUsername());
+        return (defaultPlayerIsBlack && isDefaultPlayer) || (!defaultPlayerIsBlack && !isDefaultPlayer) ? CellValue.BLACK : CellValue.WHITE;
     }
 
     private CellValue getCellValue(List<MatrixRow> rows, int row, int col) {
