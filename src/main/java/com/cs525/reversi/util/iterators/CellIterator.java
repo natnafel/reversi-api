@@ -40,7 +40,11 @@ public abstract class CellIterator {
     }
 
     protected CellValue getCellValue(int row, int col){
-        return rows.get(row).getCells().get(col);
+        return rows.get(row).getCells().get(col).getCellValue();
+    }
+
+    public boolean isCurrentOccupied(){
+        return rows.get(currRow).getCells().get(currCol).getCellValue() != CellValue.EMPTY;
     }
 
     protected CellLocation getCellLocation(int row, int col) {

@@ -2,6 +2,7 @@ package com.cs525.reversi.req;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +17,7 @@ public class CellLocation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @NonNull
+    @Column(name="roww")
     private int row;
     @NonNull
     private int col;

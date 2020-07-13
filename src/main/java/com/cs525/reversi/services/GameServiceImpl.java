@@ -18,7 +18,6 @@ import com.cs525.reversi.resp.*;
 import com.cs525.reversi.util.factory.AwayGameFactory;
 import com.cs525.reversi.util.moderator.GameModerator;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.cs525.reversi.config.Mapper;
@@ -80,7 +79,11 @@ public class GameServiceImpl implements GameService {
 		gameRepo.saveAndFlush(game);
 
 		if (newGameForm.getFirstMove() == GameSideDesicion.HOME) {
-			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
+			serverMoveCellLocation = null;
+			MoveScore serverMoveScore = makeMoveForServer(game);
+			if (serverMoveScore != null) {
+				serverMoveCellLocation = serverMoveScore.getCellLocation();
+			}
 			homeScore = gameModerator.playerScore(game, game.getPlayer1());
 			awayScore = gameModerator.playerScore(game, game.getPlayer2());
 		}
@@ -128,7 +131,7 @@ public class GameServiceImpl implements GameService {
 	public List<GameResponse> getAllGames() {
 
 		List<GameResponse> gameResponses = new ArrayList<>();
-		List<Game> games = gameRepo.findAll();
+		List<Game> games = gameRepo.findByOrderByIdDesc();
 
 		for (Game game : games) {
 			GameResponse gameResponse = mapper.gameModelToResponse(game);
@@ -170,7 +173,7 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
-	public NewGameAndMoveResp makeMoveForOpponent(Game game, CellLocation newMoveLocation) {
+	public void makeMoveOnlyForOpponent(Game game, CellLocation newMoveLocation) {
 		// player 2 is client
 		if (!gameModerator.validateMove(game, newMoveLocation, game.getPlayer2())) {
 			throw new IllegalMoveException(newMoveLocation);
@@ -185,6 +188,12 @@ public class GameServiceImpl implements GameService {
 		gameRepo.saveAndFlush(game);
 		cellLocationRepo.flush();
 		moveRepo.flush();
+	}
+
+	@Override
+	public NewGameAndMoveResp makeMoveForOpponent(Game game, CellLocation newMoveLocation) {
+
+		makeMoveOnlyForOpponent(game, newMoveLocation);
 
 		String infoMessage = LAST_MOVE_SUCCESSFUL_GAME_OVER;
 		ResponseStatus status = ResponseStatus.GAME_OVER;
@@ -193,7 +202,10 @@ public class GameServiceImpl implements GameService {
 		if (game.getStatus() != GameStatus.CLOSED){
 			infoMessage = MOVE_MADE_SUCCESSFULLY_MESSAGE;
 			status = ResponseStatus.SUCCESSFUL;
-			serverMoveCellLocation = makeMoveForServer(game).getCellLocation();
+			MoveScore serverMoveScore = makeMoveForServer(game);
+			if (serverMoveScore != null) {
+				serverMoveCellLocation = serverMoveScore.getCellLocation();
+			}
 		}
 
 		return new NewGameAndMoveResp(new Info(status, infoMessage), game.getUuid(),
@@ -233,24 +245,32 @@ public class GameServiceImpl implements GameService {
 	}
 
 	private List<List<CellValue>> toBoard(List<MatrixRow> rows) {
-		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells()))).collect(Collectors.toList());
+		return rows.stream().map((matrixRow -> new ArrayList<>(matrixRow.getCells().stream().map(CellValueClass::getCellValue).collect(Collectors.toList())))).collect(Collectors.toList());
 	}
 
-	private MoveScore makeMoveForServer(Game game){
+	@Override
+	public MoveScore makeMoveForServer(Game game, Algorithm algorithm) {
 		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
-				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), getDefaultAlgorithm());
+				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), algorithm);
 
-		gameModerator.applyMove(game, serverMove);
+		if (serverMove != null) {
+			gameModerator.applyMove(game, serverMove);
 
-		gameRepo.save(game);
-		cellLocationRepo.saveAll(serverMove.getCellsToFlip());
-		moveRepo.save(new Move(game, game.getPlayer1(), serverMove.getCellLocation().getRow(), serverMove.getCellLocation().getCol(), serverMove.getCellsToFlip()));
+			gameRepo.save(game);
+			cellLocationRepo.saveAll(serverMove.getCellsToFlip());
+			moveRepo.save(new Move(game, game.getPlayer1(), serverMove.getCellLocation().getRow(), serverMove.getCellLocation().getCol(), serverMove.getCellsToFlip()));
 
-		cellLocationRepo.flush();
-		moveRepo.flush();
-		gameRepo.flush();
+			cellLocationRepo.flush();
+			moveRepo.flush();
+			gameRepo.flush();
+		}
 
 		return serverMove;
+	}
+
+	@Override
+	public MoveScore makeMoveForServer(Game game){
+		return makeMoveForServer(game, getDefaultAlgorithm());
 	}
 
 }
