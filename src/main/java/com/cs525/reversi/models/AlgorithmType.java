@@ -1,7 +1,7 @@
 package com.cs525.reversi.models;
 
 public enum AlgorithmType {
-
+	
 	 Random("Random" , "RNDM" ,new RandomAlgorithm()),
 	 Gredy("Greedy" ,"GRDY" , new GredyAlgorithm()),
 	 MinMax("Min Max" , "MM" , new MinMaxAlgorithm());

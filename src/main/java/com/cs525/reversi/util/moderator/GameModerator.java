@@ -5,6 +5,8 @@ import com.cs525.reversi.req.CellLocation;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 public interface GameModerator {
     int playerScore(Game game, User player);
     void applyMove(Game game, MoveScore moveScore);
