@@ -28,15 +28,10 @@ public class MinMaxAlgorithm implements Algorithm {
 		int bestScore = Integer.MIN_VALUE;
 		homePlayer = isBlack ? CellValue.BLACK : CellValue.WHITE;
 		MoveScore bestMove = null;
-//		System.out.println("Number of moves to check : " + movePoints.size());
 		for (MoveScore move : movePoints) {
-//			System.out.println("MAIN GAME BOARD");
-//			gameBoard.forEach(System.out::println);
-//			System.out.println("MAIN MOVE");
-//			System.out.println(move);
+
 			List<MatrixRow> newBoard = getNewBoard(gameBoard, move, homePlayer);
-//			System.out.println("simulated my move");
-//			newBoard.forEach(System.out::println);
+
 			int childScore = runMinMax(newBoard, homePlayer, depth - 1, false);
 			if(childScore > bestScore) {
 				bestScore = childScore;
@@ -45,57 +40,40 @@ public class MinMaxAlgorithm implements Algorithm {
 
 		}
 		System.out.println("Nodes Visited = " + nodesVisited);
-//		System.out.println("best score is : " + bestScore);
 		System.out.println("Killing Move is : " + bestMove);
-//		System.out.println("Original game board");
-//		gameBoard.forEach(System.out::println);
 		return bestMove;
 	}
 
 	private int runMinMax(List<MatrixRow> board, CellValue player, int depth, boolean max) {
-//		System.out.println("Apply minimax");
 		nodesVisited++;
 		if (depth == 0) {
-//			System.out.println("Depth is Zero");
 			int ev = evaluate(board, player);
-//			System.out.println(" evaluation " + ev );
 			return ev;
 		}
 		CellValue opPlayer = (player == CellValue.BLACK) ? CellValue.WHITE : CellValue.BLACK;
 
 		if((max && !hasRemainingMoves(board, player)) || (!max && !hasRemainingMoves(board, opPlayer))) {
-//			System.out.println("No remaining moves");
 			return runMinMax(board, player, depth-1, !max);
 		}
 		int score = 0;
 		if(max) {
 			score = Integer.MIN_VALUE;
-//			System.out.println("My turn");
-//			System.out.println("Number of moves to check : " + gameModerator.nextPossibleMoves(board, player).size());
 			for (MoveScore move : gameModerator.nextPossibleMoves(board, player)) {
-//				System.out.println(move.hashCode());
-//				System.out.println(move);
 				List<MatrixRow> newBoard = getNewBoard(board, move, player);
-//				System.out.println("Simulated my move");
-//				newBoard.forEach(System.out::println);
+
 				int childScore = runMinMax(newBoard, player, depth - 1, false);
 				if(childScore > score) score = childScore;
 			}
 		}else {
 			score = Integer.MAX_VALUE;
-//			System.out.println("Opponent turn");
-//			System.out.println("Number of moves to check : " + gameModerator.nextPossibleMoves(board, player).size());
 			for (MoveScore move : gameModerator.nextPossibleMoves(board, opPlayer)) {
-//				System.out.println(move.hashCode());
-//				System.out.println(move);
+
 				List<MatrixRow> newBoard = getNewBoard(board, move, opPlayer);
-//				System.out.println("Simulated opponent move");
-//				newBoard.forEach(System.out::println);
+
 				int childScore = runMinMax(newBoard, player, depth - 1, true);
 				if(childScore < score) score = childScore;
 			}
 		}
-//		System.out.println("Score = : " + score);
 		return score;
 	}
 
