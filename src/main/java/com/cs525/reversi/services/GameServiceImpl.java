@@ -180,6 +180,9 @@ public class GameServiceImpl implements GameService {
 		}
 
 		MoveScore moveScoreOpponent = gameModerator.moveScoreForNewPiece(game, newMoveLocation, game.getPlayer2());
+		if(moveScoreOpponent==null) {
+			return;
+		}
 		gameModerator.applyMove(game, moveScoreOpponent);
 		cellLocationRepo.saveAll(moveScoreOpponent.getCellsToFlip());
 		moveRepo.save(new Move(game, game.getPlayer2(), moveScoreOpponent.getCellLocation().getRow(),
