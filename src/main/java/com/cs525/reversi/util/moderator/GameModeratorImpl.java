@@ -46,6 +46,9 @@ public class GameModeratorImpl implements GameModerator {
 
     @Override
     public void applyMove(Game game, MoveScore moveScore) {
+    	if(moveScore==null) {
+    		return;
+    	}
         game.changeCellValue(moveScore.getCellLocation().getRow(), moveScore.getCellLocation().getCol(), moveScore.getNewCellValue());
 
         for (CellLocation flip : moveScore.getCellsToFlip()) {
