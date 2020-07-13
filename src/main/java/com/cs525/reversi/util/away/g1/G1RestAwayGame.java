@@ -23,7 +23,7 @@ public class G1RestAwayGame extends AwayGame<UUID> {
 
 	@Override
 	protected Pair<UUID, CellLocation> startGame(String hostName, int port, boolean makeFirstMove) {
-		restTemplate.exchange(String.format("%s%s/register/%s", hostName,port, "Team 3"), HttpMethod.POST, null,
+		restTemplate.exchange(String.format("%s:%s/register/%s", hostName,port, "Team 3"), HttpMethod.POST, null,
 				G1CellLocation.class);
 
 		return new Pair<>(UUID.randomUUID(), null);
@@ -33,7 +33,7 @@ public class G1RestAwayGame extends AwayGame<UUID> {
 	protected CellLocation makeAMove(String hostName, int port, UUID identifier, CellLocation cellLocation) {
 		
 		G1CellLocation g1CellLocation = restTemplate
-				.postForEntity(String.format("%s/play", hostName, cellLocation.getRow(), cellLocation.getCol()),
+				.postForEntity(String.format("%s:%s/play", hostName, port,cellLocation.getRow(), cellLocation.getCol()),
 						cellLocation, G1CellLocation.class)
 				.getBody();
 		return new CellLocation(g1CellLocation.getRow(), g1CellLocation.getCol());
