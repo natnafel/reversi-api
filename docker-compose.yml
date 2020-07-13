@@ -10,9 +10,9 @@ services:
     environment:
       - DEFAULT_PLAYER_USERNAME=G5_Inst_1
       - DEFAULT_PLAYER_BLACK=true
-      - JDBC_URL=jdbc:mysql://db_inst_1:3306/reversi?serverTimezone=UTC
-      - JDBC_USER=root
-      - JDBC_PASSWORD=root
+      - JDBC_DATABASE_URL=jdbc:mysql://db_inst_1:3306/reversi?serverTimezone=UTC
+      - JDBC_DATABASE_USER=root
+      - JDBC_DATABASE_PASSWORD=root
     ports:
       - '8070:8080'
 
@@ -25,9 +25,9 @@ services:
     environment:
       - DEFAULT_PLAYER_BLACK=false
       - DEFAULT_PLAYER_USERNAME=G5_Inst_2
-      - JDBC_URL=jdbc:mysql://db_inst_2:3306/reversi?serverTimezone=UTC
-      - JDBC_USER=root
-      - JDBC_PASSWORD=root
+      - JDBC_DATABASE_URL=jdbc:mysql://db_inst_2:3306/reversi?serverTimezone=UTC
+      - JDBC_DATABASE_USER=root
+      - JDBC_DATABASE_PASSWORD=root
     ports:
       - '8090:8080'
 

@@ -23,6 +23,7 @@ public class MinMaxAlgorithm implements Algorithm {
 
 	@Override
 	public MoveScore decideMove(List<MoveScore> movePoints, List<MatrixRow> gameBoard) {
+		if(movePoints.isEmpty() || movePoints == null) return null;
 		System.out.println("Lets Decide A Killing Move !!");
 		int bestScore = Integer.MIN_VALUE;
 		homePlayer = isBlack ? CellValue.BLACK : CellValue.WHITE;

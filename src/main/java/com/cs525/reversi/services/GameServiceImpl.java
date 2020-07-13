@@ -1,9 +1,7 @@
 package com.cs525.reversi.services;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.cs525.reversi.exception.AlgorithmCodeDoesntExistException;
@@ -18,6 +16,7 @@ import com.cs525.reversi.resp.*;
 import com.cs525.reversi.util.factory.AwayGameFactory;
 import com.cs525.reversi.util.moderator.GameModerator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.cs525.reversi.config.Mapper;
@@ -46,7 +45,7 @@ public class GameServiceImpl implements GameService {
 	private static final String MOVE_MADE_SUCCESSFULLY_MESSAGE = "Move made successfully. Waiting for your next move";
 	private static final String LAST_MOVE_SUCCESSFUL_GAME_OVER = "Game over. Last move was made successfully.";
 	private static final int DEFAULT_START_SCORE = 2;
-	private static final AlgorithmType DEFAULT_SERVER_ALGORITHM = AlgorithmType.Gredy;
+	private static final AlgorithmType DEFAULT_SERVER_ALGORITHM = AlgorithmType.MinMax;
 
 	public GameServiceImpl(GameRepository gameRepo, UserRepository userRepo, MoveRepository moveRepo, AwayGameFactory awayGameFactory,
 						   Mapper mapper, GameModerator gameModerator, AlgorithmFactory algorithmFactory, CellLocationRepository cellLocationRepo) {
@@ -113,7 +112,7 @@ public class GameServiceImpl implements GameService {
 		Game game = gameRepo.findByUuid(uuid);
 		if (game == null)
 			return null;
-		Move move = moveRepo.findTopByOrderByIdDesc();
+		Move move = moveRepo.findTopByGameOrderByIdDesc(game);
 		GameResponse gameResponse = mapper.gameModelToResponse(game);
 		gameResponse.setBoard(toBoard(game.getRows()));
 		if (move != null)
@@ -180,6 +179,9 @@ public class GameServiceImpl implements GameService {
 		}
 
 		MoveScore moveScoreOpponent = gameModerator.moveScoreForNewPiece(game, newMoveLocation, game.getPlayer2());
+		if(moveScoreOpponent==null) {
+			return;
+		}
 		gameModerator.applyMove(game, moveScoreOpponent);
 		cellLocationRepo.saveAll(moveScoreOpponent.getCellsToFlip());
 		moveRepo.save(new Move(game, game.getPlayer2(), moveScoreOpponent.getCellLocation().getRow(),
@@ -271,6 +273,28 @@ public class GameServiceImpl implements GameService {
 	@Override
 	public MoveScore makeMoveForServer(Game game){
 		return makeMoveForServer(game, getDefaultAlgorithm());
+	}
+
+	@Scheduled(cron = "0/30 * * * * *")
+	public void closeStallingGames(){
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.add(Calendar.MINUTE, -5);
+
+		List<Game> games = gameRepo.findAllByUpdatedAtBeforeAndStatus(cal.getTime(), GameStatus.OPEN);
+
+		for (Game game : games) {
+			game.setStatus(GameStatus.CLOSED);
+			Move move = moveRepo.findTopByGameOrderByIdDesc(game);
+			if (move == null) continue;
+			if (move.getPlayer().equals(game.getPlayer1())) {
+				game.setWinner(Player.PLAYER1);
+			} else {
+				game.setWinner(Player.PLAYER2);
+			}
+		}
+
+		gameRepo.saveAll(games);
 	}
 
 }
