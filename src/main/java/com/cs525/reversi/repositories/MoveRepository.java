@@ -1,5 +1,6 @@
 package com.cs525.reversi.repositories;
 
+import com.cs525.reversi.models.Game;
 import com.cs525.reversi.models.Move;
 import com.cs525.reversi.resp.MoveResponse;
 
@@ -11,5 +12,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MoveRepository extends JpaRepository<Move, Integer> {
 	List<Move> findByGameId(int gameID);
-	Move findTopByOrderByIdDesc();
+	Move findTopByGameOrderByIdDesc(Game game);
 }

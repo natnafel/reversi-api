@@ -1,9 +1,7 @@
 package com.cs525.reversi.services;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.cs525.reversi.exception.AlgorithmCodeDoesntExistException;
@@ -18,6 +16,7 @@ import com.cs525.reversi.resp.*;
 import com.cs525.reversi.util.factory.AwayGameFactory;
 import com.cs525.reversi.util.moderator.GameModerator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.cs525.reversi.config.Mapper;
@@ -113,7 +112,7 @@ public class GameServiceImpl implements GameService {
 		Game game = gameRepo.findByUuid(uuid);
 		if (game == null)
 			return null;
-		Move move = moveRepo.findTopByOrderByIdDesc();
+		Move move = moveRepo.findTopByGameOrderByIdDesc(game);
 		GameResponse gameResponse = mapper.gameModelToResponse(game);
 		gameResponse.setBoard(toBoard(game.getRows()));
 		if (move != null)
@@ -271,6 +270,28 @@ public class GameServiceImpl implements GameService {
 	@Override
 	public MoveScore makeMoveForServer(Game game){
 		return makeMoveForServer(game, getDefaultAlgorithm());
+	}
+
+	@Scheduled(cron = "0/30 * * * * *")
+	public void closeStallingGames(){
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.add(Calendar.MINUTE, -5);
+
+		List<Game> games = gameRepo.findAllByUpdatedAtBeforeAndStatus(cal.getTime(), GameStatus.OPEN);
+
+		for (Game game : games) {
+			game.setStatus(GameStatus.CLOSED);
+			Move move = moveRepo.findTopByGameOrderByIdDesc(game);
+			if (move == null) continue;
+			if (move.getPlayer().equals(game.getPlayer1())) {
+				game.setWinner(Player.PLAYER1);
+			} else {
+				game.setWinner(Player.PLAYER2);
+			}
+		}
+
+		gameRepo.saveAll(games);
 	}
 
 }
