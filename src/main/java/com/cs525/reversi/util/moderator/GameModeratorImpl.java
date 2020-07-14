@@ -72,7 +72,7 @@ public class GameModeratorImpl implements GameModerator {
 
     @Override
     public MoveScore moveByAlgorithmForUser(Game game, User serverUser, Algorithm algorithm) {
-        return algorithm.decideMove(nextPossibleMoves(game.getRows(), getPlayerCellValue(game, serverUser)), game.getRows());
+        return algorithm.decideMove(nextPossibleMoves(game.getRows(), getPlayerCellValue(game, serverUser)), game);
     }
 
     @Override
