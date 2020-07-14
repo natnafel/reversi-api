@@ -18,12 +18,12 @@ public class MinMaxAlgorithm implements Algorithm {
 	@Value("${reversi.default-player.is-black}")
 	private boolean isBlack;
 	private static  CellValue homePlayer;
-	private int depth = 3;
+	private int depth = 4;
 	private static int nodesVisited = 0;
 
 	@Override
 	public MoveScore decideMove(List<MoveScore> movePoints, List<MatrixRow> gameBoard) {
-		if(movePoints.isEmpty() || movePoints == null) return null;
+		if(movePoints == null || movePoints.isEmpty()) return null;
 		System.out.println("Lets Decide A Killing Move !!");
 		int bestScore = Integer.MIN_VALUE;
 		homePlayer = isBlack ? CellValue.BLACK : CellValue.WHITE;
@@ -87,7 +87,7 @@ public class MinMaxAlgorithm implements Algorithm {
 		int mobilityScore = evaluateMobility(board, homePlayer);
 		int cornerScore = evaluateCorners(board, homePlayer);
 		int discDiffSc = evaluateDiscDiff(board, homePlayer);
-		return 2 * mobilityScore + discDiffSc + 1000*cornerScore;
+		return discDiffSc + 10 * mobilityScore + 5 * cornerScore;
 
 	}
 

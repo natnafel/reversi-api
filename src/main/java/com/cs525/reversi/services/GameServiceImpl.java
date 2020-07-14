@@ -279,7 +279,7 @@ public class GameServiceImpl implements GameService {
 	public void closeStallingGames(){
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
-		cal.add(Calendar.MINUTE, -5);
+		cal.add(Calendar.MINUTE, -15);
 
 		List<Game> games = gameRepo.findAllByUpdatedAtBeforeAndStatus(cal.getTime(), GameStatus.OPEN);
 
