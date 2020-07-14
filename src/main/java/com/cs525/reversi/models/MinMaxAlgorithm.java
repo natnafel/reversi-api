@@ -6,12 +6,15 @@ import java.util.List;
 import com.cs525.reversi.repositories.MoveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.util.moderator.GameModerator;
 
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MinMaxAlgorithm implements Algorithm {
 	@Autowired
 	private GameModerator gameModerator;
@@ -22,7 +25,7 @@ public class MinMaxAlgorithm implements Algorithm {
 	@Value("${reversi.default-player.is-black}")
 	private boolean isBlack;
 	private static  CellValue homePlayer;
-	private int depth = 3;
+	private int depth = 4;
 	private static int nodesVisited = 0;
 	private static boolean isStarter;
 
@@ -49,6 +52,7 @@ public class MinMaxAlgorithm implements Algorithm {
 		}
 		System.out.println("Nodes Visited = " + nodesVisited);
 		System.out.println("Killing Move is : " + bestMove);
+		nodesVisited = 0;
 		return bestMove;
 	}
 
