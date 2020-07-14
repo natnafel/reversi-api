@@ -4,7 +4,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -23,7 +36,7 @@ public class Game {
 	private int id;
 
 	@Type(type = "uuid-char")
-	@Column( nullable = false)
+	@Column(nullable = false)
 	@NonNull
 	private UUID uuid;
 
@@ -52,18 +65,19 @@ public class Game {
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@OrderBy("id")
-    private List<MatrixRow> rows;	
+	private List<MatrixRow> rows;
 
-	public void changeCellValue (Integer cellRow , Integer cellCol , CellValue value) {
+	public void changeCellValue(Integer cellRow, Integer cellCol, CellValue value) {
 		rows.get(cellRow).getCells().get(cellCol).setCellValue(value);
 	}
-	
+
 	public void setDefaultCells() {
-		 this.changeCellValue(3, 3, CellValue.BLACK);
-		 this.changeCellValue(4, 4, CellValue.BLACK);
-		 this.changeCellValue(3, 4, CellValue.WHITE);
-		 this.changeCellValue(4, 3, CellValue.WHITE);
+		this.changeCellValue(3, 3, CellValue.WHITE);
+		this.changeCellValue(4, 4, CellValue.WHITE);
+		this.changeCellValue(3, 4, CellValue.BLACK);
+		this.changeCellValue(4, 3, CellValue.BLACK);
 	}
+
 	// nullable
 	@Enumerated(EnumType.STRING)
 	private Player winner;

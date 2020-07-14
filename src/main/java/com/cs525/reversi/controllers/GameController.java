@@ -3,6 +3,7 @@ package com.cs525.reversi.controllers;
 import java.util.List;
 import java.util.UUID;
 
+import com.cs525.reversi.models.CellValue;
 import com.cs525.reversi.models.LookupResp;
 import com.cs525.reversi.req.AwayGameRequest;
 import com.cs525.reversi.req.CellLocation;
@@ -11,6 +12,7 @@ import com.cs525.reversi.resp.AwayGameResponse;
 import com.cs525.reversi.resp.NewGameAndMoveResp;
 import com.cs525.reversi.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -30,6 +32,8 @@ public class GameController {
 	@Autowired
 	private GameService gameService;
 
+	@Value("${reversi.default-player.is-black}")
+	private boolean defaultUserIsBlack;
 
 	@PostMapping("/games")
 	public NewGameAndMoveResp createNewGame(@RequestBody NewGame newGameForm) {
@@ -67,6 +71,11 @@ public class GameController {
 		GameResponse game = gameService.getGame(uuid);
 		return game == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(game);
 
+	}
+
+	@GetMapping("/default-player-color")
+	public CellValue getDefaultPlayerColor(){
+		return defaultUserIsBlack ? CellValue.BLACK : CellValue.WHITE;
 	}
 
 	@GetMapping("/games")
