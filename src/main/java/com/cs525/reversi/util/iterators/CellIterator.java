@@ -44,6 +44,9 @@ public abstract class CellIterator {
     }
 
     public boolean isCurrentOccupied(){
+    	if(currRow==-1 && currCol==-1) {
+    		return true;
+    	}
         return rows.get(currRow).getCells().get(currCol).getCellValue() != CellValue.EMPTY;
     }
 

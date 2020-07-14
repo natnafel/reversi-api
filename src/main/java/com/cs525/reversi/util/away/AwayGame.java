@@ -25,6 +25,9 @@ public abstract class AwayGame<T> {
             }
             if (game.getStatus() != GameStatus.OPEN) break;
             CellLocation opponentCellMove = makeAMove(hostName, port, startGameResponse.getKey(), serverMoveCellLocation);
+            if(opponentCellMove==null) {
+            	opponentCellMove = new CellLocation(-1,-1);
+            }
             gameService.makeMoveOnlyForOpponent(game, opponentCellMove);
         }
     }

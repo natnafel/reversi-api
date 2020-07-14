@@ -1,15 +1,36 @@
 package com.cs525.reversi.util.moderator;
 
-import com.cs525.reversi.models.*;
-import com.cs525.reversi.req.CellLocation;
-import com.cs525.reversi.util.Pair;
-import com.cs525.reversi.util.iterators.*;
-import com.cs525.reversi.util.rules.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.cs525.reversi.models.Algorithm;
+import com.cs525.reversi.models.CellValue;
+import com.cs525.reversi.models.Game;
+import com.cs525.reversi.models.GameStatus;
+import com.cs525.reversi.models.MatrixRow;
+import com.cs525.reversi.models.MoveScore;
+import com.cs525.reversi.models.Player;
+import com.cs525.reversi.models.User;
+import com.cs525.reversi.req.CellLocation;
+import com.cs525.reversi.util.Pair;
+import com.cs525.reversi.util.iterators.CellIterator;
+import com.cs525.reversi.util.iterators.EastIterator;
+import com.cs525.reversi.util.iterators.NorthEastIterator;
+import com.cs525.reversi.util.iterators.NorthIterator;
+import com.cs525.reversi.util.iterators.NorthWestIterator;
+import com.cs525.reversi.util.iterators.SouthEastIterator;
+import com.cs525.reversi.util.iterators.SouthIterator;
+import com.cs525.reversi.util.iterators.SouthWestIterator;
+import com.cs525.reversi.util.iterators.WestIterator;
+import com.cs525.reversi.util.rules.EmptyRule;
+import com.cs525.reversi.util.rules.MustPlayTurnRule;
+import com.cs525.reversi.util.rules.NewValueNotEmptyRule;
+import com.cs525.reversi.util.rules.OpenGameRule;
+import com.cs525.reversi.util.rules.ResultsInPointsRule;
+import com.cs525.reversi.util.rules.Rule;
 
 @Component
 public class GameModeratorImpl implements GameModerator {
@@ -45,6 +66,9 @@ public class GameModeratorImpl implements GameModerator {
 
 	@Override
 	public void applyMove(Game game, MoveScore moveScore) {
+		if (moveScore == null) {
+			return;
+		}
 		game.changeCellValue(moveScore.getCellLocation().getRow(), moveScore.getCellLocation().getCol(),
 				moveScore.getNewCellValue());
 
@@ -148,7 +172,6 @@ public class GameModeratorImpl implements GameModerator {
 	}
 
 	private CellValue getPlayerCellValue(Game game, User player) {
-
 		boolean isDefaultPlayer = game.getPlayer1().getUsername().equals(player.getUsername());
 		return (defaultPlayerIsBlack && isDefaultPlayer) || (!defaultPlayerIsBlack && !isDefaultPlayer)
 				? CellValue.BLACK
