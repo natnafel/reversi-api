@@ -54,7 +54,8 @@ public class GameModeratorImpl implements GameModerator {
         for (CellLocation flip : moveScore.getCellsToFlip()) {
             game.changeCellValue(flip.getRow(), flip.getCol(), moveScore.getNewCellValue());
         }
-        if (isBoardFull(game.getRows())) {
+        if (isBoardFull(game.getRows()) ||
+                (nextPossibleMoves(game.getRows(), CellValue.BLACK).isEmpty() && nextPossibleMoves(game.getRows(), CellValue.WHITE).isEmpty())) {
             game.setStatus(GameStatus.CLOSED);
             // if game is a tie then winner will remain null
             if(playerScore(game, game.getPlayer1()) > playerScore(game, game.getPlayer2())) {
@@ -147,7 +148,8 @@ public class GameModeratorImpl implements GameModerator {
         return seenCellWithSameValue ? flipLocations : new ArrayList<>();
     }
 
-    private CellValue getPlayerCellValue(Game game, User player) {
+    @Override
+    public CellValue getPlayerCellValue(Game game, User player) {
         boolean isDefaultPlayer = game.getPlayer1().getUsername().equals(player.getUsername());
         return (defaultPlayerIsBlack && isDefaultPlayer) || (!defaultPlayerIsBlack && !isDefaultPlayer) ? CellValue.BLACK : CellValue.WHITE;
     }

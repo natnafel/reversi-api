@@ -14,4 +14,5 @@ public interface GameModerator {
     MoveScore moveByAlgorithmForUser(Game game, User serverUser, Algorithm algorithm);
     List<MoveScore> nextPossibleMoves(List<MatrixRow> rows, CellValue newCellValue);
     MoveScore moveScoreForNewPiece(Game game, CellLocation newCellLocation, User player);
+    CellValue getPlayerCellValue(Game game, User player);
 }

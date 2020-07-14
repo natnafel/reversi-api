@@ -3,6 +3,7 @@ package com.cs525.reversi.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cs525.reversi.repositories.MoveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,9 @@ import com.cs525.reversi.util.moderator.GameModerator;
 public class MinMaxAlgorithm implements Algorithm {
 	@Autowired
 	private GameModerator gameModerator;
+
+	@Autowired
+	private MoveRepository moveRepository;
 	
 	@Value("${reversi.default-player.is-black}")
 	private boolean isBlack;
@@ -23,8 +27,10 @@ public class MinMaxAlgorithm implements Algorithm {
 
 	@Override
 	public MoveScore decideMove(List<MoveScore> movePoints, Game game) {
-		List<MatrixRow> gameBoard = game.getRows();
 		if(movePoints == null || movePoints.isEmpty()) return null;
+		List<MatrixRow> gameBoard = game.getRows();
+		Move firstMove = moveRepository.findTopByGameOrderByIdDesc(game);
+		boolean isStarter = firstMove == null || gameModerator.getPlayerCellValue(game, firstMove.getPlayer()) == movePoints.get(0).getNewCellValue();
 		System.out.println("Lets Decide A Killing Move !!");
 		int bestScore = Integer.MIN_VALUE;
 		homePlayer = isBlack ? CellValue.BLACK : CellValue.WHITE;
