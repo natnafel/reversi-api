@@ -22,15 +22,16 @@ public class MinMaxAlgorithm implements Algorithm {
 	@Value("${reversi.default-player.is-black}")
 	private boolean isBlack;
 	private static  CellValue homePlayer;
-	private int depth = 4;
+	private int depth = 3;
 	private static int nodesVisited = 0;
+	private static boolean isStarter;
 
 	@Override
 	public MoveScore decideMove(List<MoveScore> movePoints, Game game) {
 		if(movePoints == null || movePoints.isEmpty()) return null;
 		List<MatrixRow> gameBoard = game.getRows();
 		Move firstMove = moveRepository.findTopByGameOrderByIdDesc(game);
-		boolean isStarter = firstMove == null || gameModerator.getPlayerCellValue(game, firstMove.getPlayer()) == movePoints.get(0).getNewCellValue();
+		isStarter = firstMove == null || gameModerator.getPlayerCellValue(game, firstMove.getPlayer()) == movePoints.get(0).getNewCellValue();
 		System.out.println("Lets Decide A Killing Move !!");
 		int bestScore = Integer.MIN_VALUE;
 		homePlayer = isBlack ? CellValue.BLACK : CellValue.WHITE;
@@ -94,8 +95,10 @@ public class MinMaxAlgorithm implements Algorithm {
 		int mobilityScore = evaluateMobility(board, homePlayer);
 		int cornerScore = evaluateCorners(board, homePlayer);
 		int discDiffSc = evaluateDiscDiff(board, homePlayer);
-		return mobilityScore + cornerScore + discDiffSc;
-
+//		if(!isStarter) {
+//			return discDiffSc + 50 * mobilityScore + cornerScore;
+//		}
+		return discDiffSc + 10 * mobilityScore + 5 * cornerScore;
 	}
 
 	private int evaluateDiscDiff(List<MatrixRow> board, CellValue homePlayer) {
