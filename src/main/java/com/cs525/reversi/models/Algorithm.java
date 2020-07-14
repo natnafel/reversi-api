@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface Algorithm {
 
-	MoveScore decideMove(List<MoveScore> movePoints, List<MatrixRow> gameBoard);
+	MoveScore decideMove(List<MoveScore> movePoints, Game game);
 }

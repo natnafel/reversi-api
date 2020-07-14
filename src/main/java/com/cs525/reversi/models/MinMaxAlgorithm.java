@@ -22,7 +22,8 @@ public class MinMaxAlgorithm implements Algorithm {
 	private static int nodesVisited = 0;
 
 	@Override
-	public MoveScore decideMove(List<MoveScore> movePoints, List<MatrixRow> gameBoard) {
+	public MoveScore decideMove(List<MoveScore> movePoints, Game game) {
+		List<MatrixRow> gameBoard = game.getRows();
 		if(movePoints == null || movePoints.isEmpty()) return null;
 		System.out.println("Lets Decide A Killing Move !!");
 		int bestScore = Integer.MIN_VALUE;
@@ -88,6 +89,7 @@ public class MinMaxAlgorithm implements Algorithm {
 		int cornerScore = evaluateCorners(board, homePlayer);
 		int discDiffSc = evaluateDiscDiff(board, homePlayer);
 		return discDiffSc + 10 * mobilityScore + 5 * cornerScore;
+
 
 	}
 
