@@ -45,7 +45,7 @@ public class GameServiceImpl implements GameService {
 	private static final String MOVE_MADE_SUCCESSFULLY_MESSAGE = "Move made successfully. Waiting for your next move";
 	private static final String LAST_MOVE_SUCCESSFUL_GAME_OVER = "Game over. Last move was made successfully.";
 	private static final int DEFAULT_START_SCORE = 2;
-	private static final AlgorithmType DEFAULT_SERVER_ALGORITHM = AlgorithmType.Gredy;
+	private static final AlgorithmType DEFAULT_SERVER_ALGORITHM = AlgorithmType.MinMax;
 
 	public GameServiceImpl(GameRepository gameRepo, UserRepository userRepo, MoveRepository moveRepo, AwayGameFactory awayGameFactory,
 						   Mapper mapper, GameModerator gameModerator, AlgorithmFactory algorithmFactory, CellLocationRepository cellLocationRepo) {
@@ -255,7 +255,7 @@ public class GameServiceImpl implements GameService {
 		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
 				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), algorithm);
 
-		if (serverMove != null) {
+		if (serverMove != null && serverMove.getCellLocation().getCol() != -1) {
 			gameModerator.applyMove(game, serverMove);
 
 			gameRepo.save(game);
