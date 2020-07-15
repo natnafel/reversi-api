@@ -22,7 +22,7 @@ public class MinMaxAlgorithm implements Algorithm {
 	@Value("${reversi.default-player.is-black}")
 	private boolean isBlack;
 	private static  CellValue homePlayer;
-	private int depth = 5;
+	private int depth = 3;
 	private static int nodesVisited = 0;
 	private static boolean isStarter;
 
