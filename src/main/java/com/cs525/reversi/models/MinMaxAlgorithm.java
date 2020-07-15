@@ -22,13 +22,13 @@ public class MinMaxAlgorithm implements Algorithm {
 	@Value("${reversi.default-player.is-black}")
 	private boolean isBlack;
 	private static  CellValue homePlayer;
-	private int depth = 3;
+	private int depth = 5;
 	private static int nodesVisited = 0;
 	private static boolean isStarter;
 
 	@Override
 	public MoveScore decideMove(List<MoveScore> movePoints, Game game) {
-		if(movePoints == null || movePoints.isEmpty()) return null;
+		if (movePoints == null || movePoints.isEmpty()) return new MoveScore(CellValue.EMPTY, new CellLocation(-1, -1), new ArrayList<>());
 		List<MatrixRow> gameBoard = game.getRows();
 		Move firstMove = moveRepository.findTopByGameOrderByIdDesc(game);
 		isStarter = firstMove == null || gameModerator.getPlayerCellValue(game, firstMove.getPlayer()) == movePoints.get(0).getNewCellValue();
@@ -95,10 +95,7 @@ public class MinMaxAlgorithm implements Algorithm {
 		int mobilityScore = evaluateMobility(board, homePlayer);
 		int cornerScore = evaluateCorners(board, homePlayer);
 		int discDiffSc = evaluateDiscDiff(board, homePlayer);
-//		if(!isStarter) {
-//			return discDiffSc + 50 * mobilityScore + cornerScore;
-//		}
-		return discDiffSc + 10 * mobilityScore + 5 * cornerScore;
+		return 10 * mobilityScore + 5 * cornerScore + discDiffSc;
 	}
 
 	private int evaluateDiscDiff(List<MatrixRow> board, CellValue homePlayer) {

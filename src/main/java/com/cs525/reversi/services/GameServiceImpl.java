@@ -255,7 +255,7 @@ public class GameServiceImpl implements GameService {
 		MoveScore serverMove = gameModerator.moveByAlgorithmForUser(game,
 				userRepo.findByUsername(defaultPlayerUsername).orElseThrow(() -> new UsernameDoesNotExist(defaultPlayerUsername)), algorithm);
 
-		if (serverMove != null) {
+		if (serverMove != null && serverMove.getCellLocation().getCol() != -1) {
 			gameModerator.applyMove(game, serverMove);
 
 			gameRepo.save(game);
@@ -279,7 +279,7 @@ public class GameServiceImpl implements GameService {
 	public void closeStallingGames(){
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
-		cal.add(Calendar.MINUTE, -15);
+		cal.add(Calendar.MINUTE, -5);
 
 		List<Game> games = gameRepo.findAllByUpdatedAtBeforeAndStatus(cal.getTime(), GameStatus.OPEN);
 
