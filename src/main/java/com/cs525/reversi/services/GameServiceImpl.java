@@ -275,7 +275,7 @@ public class GameServiceImpl implements GameService {
 		return makeMoveForServer(game, getDefaultAlgorithm());
 	}
 
-	@Scheduled(cron = "0/30 * * * * *")
+//	@Scheduled(cron = "0/30 * * * * *")
 	public void closeStallingGames(){
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());

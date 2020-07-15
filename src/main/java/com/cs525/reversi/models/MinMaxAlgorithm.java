@@ -74,7 +74,8 @@ public class MinMaxAlgorithm implements Algorithm {
 			}
 		}else {
 			score = Integer.MAX_VALUE;
-			for (MoveScore move : gameModerator.nextPossibleMoves(board, opPlayer)) {
+			List<MoveScore> moves = gameModerator.nextPossibleMoves(board, opPlayer);
+			for (MoveScore move : moves) {
 
 				List<MatrixRow> newBoard = getNewBoard(board, move, opPlayer);
 
@@ -95,14 +96,21 @@ public class MinMaxAlgorithm implements Algorithm {
 		int mobilityScore = evaluateMobility(board, homePlayer);
 		int cornerScore = evaluateCorners(board, homePlayer);
 		int discDiffSc = evaluateDiscDiff(board, homePlayer);
-		return 10 * mobilityScore + 5 * cornerScore + discDiffSc;
+		int xSquareScore = evaluateXSquare(board, homePlayer);
+		int cSquareScore = evaluateCSquare(board, homePlayer);
+		return 100 * mobilityScore + 200 * cornerScore + 30 * discDiffSc + 100 * xSquareScore + 50 * cSquareScore;
+//		return 10 * mobilityScore + 5 * cornerScore + discDiffSc;
+		// beats with level 3 op start
+//		return 100 * mobilityScore + 200 * cornerScore + 30 * discDiffSc + 100 * xSquareScore + 50 * cSquareScore;
 	}
 
 	private int evaluateDiscDiff(List<MatrixRow> board, CellValue homePlayer) {
 		CellValue opPlayer = (homePlayer == CellValue.BLACK) ? CellValue.WHITE : CellValue.BLACK;
 		int myCount = getStoneCount(board, homePlayer);
 		int opCount = getStoneCount(board, opPlayer);
-		return 100 * (myCount - opCount) / (myCount + opCount);
+		int diff = 100 * (myCount - opCount) / (myCount + opCount);
+		if (myCount + opCount < 40) diff *= -1;
+		return diff;
 	}
 
 	private int getStoneCount(List<MatrixRow> board, CellValue player) {
@@ -139,6 +147,83 @@ public class MinMaxAlgorithm implements Algorithm {
 		if(board.get(7).getCells().get(7).getCellValue() == opPlayer) opCorners++;
 
 		return 100 * (myCorners - opCorners) / (myCorners + opCorners + 1);
+	}
+
+	private int evaluateXSquare(List<MatrixRow> board, CellValue homePlayer) {
+		CellValue opPlayer = (homePlayer == CellValue.BLACK) ? CellValue.WHITE : CellValue.BLACK;
+
+		int mySquares = xSquareHelper(board, CellValue.EMPTY);
+		int opSquares = xSquareHelper(board, CellValue.EMPTY);
+
+		return -1 * 100 * (mySquares - opSquares) / (mySquares + opSquares + 1);
+	}
+
+	private int evaluateCSquare(List<MatrixRow> board, CellValue homePlayer) {
+		CellValue opPlayer = (homePlayer == CellValue.BLACK) ? CellValue.WHITE : CellValue.BLACK;
+
+		int mySquares = cSquareHelper(board, homePlayer);
+		int opSquares = cSquareHelper(board, opPlayer);
+
+		return -1 * 100 * (mySquares - opSquares) / (mySquares + opSquares + 1);
+	}
+
+	private int xSquareHelper(List<MatrixRow> board, CellValue cellValue){
+		int squares = 0;
+
+		if(board.get(1).getCells().get(1).getCellValue() == cellValue) {
+			squares = board.get(0).getCells().get(0).getCellValue() != cellValue ? squares++ : squares--;
+		}
+		if(board.get(1).getCells().get(6).getCellValue() == cellValue) {
+			squares = board.get(0).getCells().get(7).getCellValue() != cellValue ? squares++ : squares--;
+		}
+		if(board.get(6).getCells().get(6).getCellValue() == cellValue) {
+			squares = board.get(7).getCells().get(7).getCellValue() != cellValue ? squares++ : squares--;
+		}
+		if(board.get(6).getCells().get(1).getCellValue() == cellValue) {
+			squares = board.get(7).getCells().get(0).getCellValue() != cellValue ? squares++ : squares--;
+		}
+
+		return squares;
+	}
+
+//	private int evaluateFlips(List<MatrixRow> board, CellValue homePlayer) {
+//		CellValue opPlayer = (homePlayer == CellValue.BLACK) ? CellValue.WHITE : CellValue.BLACK;
+//
+//	}
+
+	private int cSquareHelper(List<MatrixRow> board, CellValue cellValue) {
+		int squares = 0;
+
+		if(board.get(0).getCells().get(1).getCellValue() == cellValue){
+			squares = board.get(0).getCells().get(0).getCellValue() != cellValue ? squares++ : squares--;
+		}
+		if(board.get(1).getCells().get(0).getCellValue() == cellValue) {
+			squares = board.get(0).getCells().get(0).getCellValue() != cellValue ? squares++ : squares--;
+		}
+
+		if(board.get(0).getCells().get(6).getCellValue() == cellValue) {
+			squares = board.get(0).getCells().get(7).getCellValue() != cellValue ? squares++ : squares--;
+		}
+		if(board.get(1).getCells().get(7).getCellValue() == cellValue) {
+			squares = board.get(0).getCells().get(7).getCellValue() != cellValue ? squares++ : squares--;
+		}
+
+		if(board.get(6).getCells().get(0).getCellValue() == cellValue) {
+			squares = board.get(7).getCells().get(0).getCellValue() != cellValue ? squares++ : squares--;
+		}
+
+		if(board.get(7).getCells().get(1).getCellValue() == cellValue) {
+			squares = board.get(7).getCells().get(0).getCellValue() != cellValue ? squares++ : squares--;
+		}
+
+		if(board.get(6).getCells().get(7).getCellValue() == cellValue) {
+			squares = board.get(7).getCells().get(7).getCellValue() != cellValue ? squares++ :squares--;
+		}
+		if(board.get(7).getCells().get(6).getCellValue() == cellValue) {
+			squares = board.get(7).getCells().get(7).getCellValue() != cellValue ? squares++ : squares--;
+		}
+
+		return squares;
 	}
 
 	private List<MatrixRow> getNewBoard(List<MatrixRow> board, MoveScore move, CellValue player) {
