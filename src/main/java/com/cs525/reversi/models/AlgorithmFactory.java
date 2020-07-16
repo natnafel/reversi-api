@@ -6,12 +6,30 @@ import org.springframework.stereotype.Component;
 @Component
 public class AlgorithmFactory {
 	@Autowired
-	MinMaxAlgorithm minMaxAlgorithm;
-	
-	public Algorithm getAlgorithm(AlgorithmType algorithType) {
-		if(algorithType == AlgorithmType.MinMax) {
-			return minMaxAlgorithm;
+	MinimaxFactory minimaxFactory;
+	public Algorithm getAlgorithm(AlgorithmType algorithmType, AlgorithmMode algorithmMode) {
+		
+		if(algorithmType == AlgorithmType.MinMax) {
+			
+			return minimaxFactory.getMMAlgorithm(algorithmMode);
+			
+		}else if(algorithmType == AlgorithmType.Gredy) {
+			return GreedyFacotry.getGreedyAlgorithm();
+			
+		} else {
+			return RandomFacotry.getRandomAlgorithm();
 		}
-		return algorithType.getAlgorithm();
+		
 	}
 }
+	
+//	@Autowired
+//	MinMaxAlgorithm minMaxAlgorithm;
+//	
+//	public Algorithm getAlgorithm(AlgorithmType algorithType) {
+//		if(algorithType == AlgorithmType.MinMax) {
+//			return minMaxAlgorithm;
+//		}
+//		return algorithType.getAlgorithm();
+//	}
+//}

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.2.4" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
+  <class id="1" language="java" name="com.cs525.reversi.util.iterators.CellIterator" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/iterators/CellIterator.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="317" width="216" x="809" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="com.cs525.reversi.util.iterators.EastIterator" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/iterators/EastIterator.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="119" width="216" x="809" y="394"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="com.cs525.reversi.util.iterators.NorthEastIterator" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/iterators/NorthEastIterator.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="119" width="216" x="553" y="394"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="com.cs525.reversi.util.iterators.NorthIterator" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/iterators/NorthIterator.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="119" width="216" x="297" y="394"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="com.cs525.reversi.util.iterators.NorthWestIterator" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/iterators/NorthWestIterator.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="119" width="218" x="1065" y="394"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="6" language="java" name="com.cs525.reversi.util.iterators.SouthEastIterator" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/iterators/SouthEastIterator.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="119" width="217" x="1323" y="394"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="7" language="java" name="com.cs525.reversi.util.iterators.SouthIterator" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/iterators/SouthIterator.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="119" width="216" x="41" y="394"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="8" language="java" name="com.cs525.reversi.util.iterators.WestIterator" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/iterators/WestIterator.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="119" width="216" x="1580" y="394"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <generalization id="9">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <generalization id="10">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <generalization id="11">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <generalization id="12">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <generalization id="13">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <generalization id="14">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <generalization id="15">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    sort-features="false" accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="true" package="true" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

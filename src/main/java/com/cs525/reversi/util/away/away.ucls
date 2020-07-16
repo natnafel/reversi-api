@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.2.4" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="true" nesting-relationships="true" router="FAN">  
+  <class id="1" language="java" name="com.cs525.reversi.util.away.g1.G1RestAwayGame" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/away/g1/G1RestAwayGame.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="155" width="321" x="41" y="391"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="com.cs525.reversi.util.away.g2.G2RestAwayGame" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/away/g2/G2RestAwayGame.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="155" width="321" x="402" y="391"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="com.cs525.reversi.util.away.AwayGame" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/away/AwayGame.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="173" width="298" x="402" y="178"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="com.cs525.reversi.util.away.G3RestAwayGame" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/away/G3RestAwayGame.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="209" width="321" x="763" y="391"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="com.cs525.reversi.util.factory.AwayGameFactory" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/factory/AwayGameFactory.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="101" width="243" x="402" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="6" language="java" name="com.cs525.reversi.util.away.g1.G1CellLocation" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/away/g1/G1CellLocation.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="281" width="165" x="41" y="640"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="7" language="java" name="com.cs525.reversi.util.away.g2.G2CellLocation" project="reversi-api" 
+    file="/reversi-api/src/main/java/com/cs525/reversi/util/away/g2/G2CellLocation.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="281" width="165" x="402" y="640"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <dependency id="8">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="6"/>  
+  </dependency>  
+  <generalization id="9">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="10">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <dependency id="11">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="7"/>  
+  </dependency>  
+  <association id="12">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="13" name="awayGames"/>      
+      <multiplicity id="14" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="15">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" 
+    sort-features="false" accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="true" package="true" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
