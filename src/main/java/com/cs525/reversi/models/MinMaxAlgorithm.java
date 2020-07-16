@@ -3,13 +3,11 @@ package com.cs525.reversi.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cs525.reversi.repositories.MoveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.cs525.reversi.repositories.MoveRepository;
 import com.cs525.reversi.req.CellLocation;
 import com.cs525.reversi.util.moderator.GameModerator;
 
